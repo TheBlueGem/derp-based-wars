@@ -10,14 +10,15 @@ def main():
     FPSCLOCK = pygame.time.Clock()
     DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
 
+    board_width = 30
+    board_height = 30
+
     pygame.display.set_caption('Derp Based Wars')
 
-    mainBoard = createBoard()
-
-    DISPLAYSURF.fill(BACKGROUNDCOLOR)
+    main_board = createBoard(board_width, board_height)
 
     while True:
-        drawBoard(mainBoard, DISPLAYSURF)
+        drawBoard(main_board, board_width, board_height, DISPLAYSURF)
 
         for event in pygame.event.get():
             if event.type == QUIT or (event.type == KEYUP and event.key == K_ESCAPE):
