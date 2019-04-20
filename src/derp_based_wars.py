@@ -1,8 +1,9 @@
 import pygame, sys, board, common, options
 from pygame import init
 from pygame.locals import QUIT, KEYUP, K_ESCAPE
-from board import *
+from board import Board
 from options import FPS
+from common import *
 
 # Main game loop
 def main():
@@ -16,7 +17,8 @@ def main():
 
     pygame.display.set_caption('Derp Based Wars')
 
-    main_board = createBoard(board_width, board_height, DISPLAYSURF)
+    main_board = Board(board_width, board_height)
+    main_board.draw(DISPLAYSURF)
 
     while True:
         for event in pygame.event.get():
@@ -24,7 +26,7 @@ def main():
                 pygame.quit()
                 sys.exit()
         
-        drawBoard(main_board, DISPLAYSURF)
+        main_board.draw(DISPLAYSURF)
         pygame.display.update()
         FPSCLOCK.tick(FPS)
 
