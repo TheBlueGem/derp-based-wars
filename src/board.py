@@ -31,24 +31,27 @@ def drawBoard(board, surface):
                 pygame.draw.line(new_surf, SQUAREBORDERCOLOR, (min_x, min_y), (min_x + TILESIZE, min_y))
                 pygame.draw.line(new_surf, SQUAREBORDERCOLOR, (min_x, min_y), (min_x, min_y + TILESIZE))        
 
-                if x + 1 == width:
-                    pygame.draw.line(new_surf, SQUAREBORDERCOLOR, (min_x, min_y + TILESIZE), (min_x + TILESIZE, min_y + TILESIZE))
-                if y + 1 == height:
+                if (x + 1) == width:
                     pygame.draw.line(new_surf, SQUAREBORDERCOLOR, (min_x + TILESIZE, min_y), (min_x + TILESIZE, min_y + TILESIZE))
+                if (y + 1) == height:
+                    pygame.draw.line(new_surf, SQUAREBORDERCOLOR, (min_x, min_y + TILESIZE), (min_x + TILESIZE, min_y + TILESIZE))
 
     surface.blit(new_surf, (0, 0))
 
+# Set a tile on the board
 def setTile(x, y, color, board):
     board[x][y] = {
         'color': color
     }
     return board
 
+# Get the coordinates of the top left corner of a tile
 def leftAndTopCoordsOfTile(tile_x, tile_y):
     min_y = tile_y * TILESIZE
     min_x = tile_x * TILESIZE
     return (min_x, min_y)
 
+# Get a tile from the board
 def getTile(x, y, board):
     if board[x][y]:
         min_x, min_y = leftAndTopCoordsOfTile(x, y)

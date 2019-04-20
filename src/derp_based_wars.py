@@ -6,14 +6,15 @@ from options import FPS
 from units.unit import Unit
 from units.soldier import Soldier
 
+# Main game loop
 def main():
     global FPSCLOCK, DISPLAYSURF
     pygame.init()
     FPSCLOCK = pygame.time.Clock()
     DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
 
-    board_width = 30
-    board_height = 30
+    board_width = 10
+    board_height = 10
 
     pygame.display.set_caption('Derp Based Wars')
 
