@@ -3,6 +3,8 @@ from pygame import init
 from pygame.locals import QUIT, KEYUP, K_ESCAPE
 from board import *
 from options import FPS
+from units.unit import Unit
+from units.soldier import Soldier
 
 def main():
     global FPSCLOCK, DISPLAYSURF
