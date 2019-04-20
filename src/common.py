@@ -1,3 +1,4 @@
+# Colors consts
 GRAY = (128, 128, 128)
 WHITE = (255, 255, 255)
 BLUE = (0, 0, 128)
@@ -7,6 +8,7 @@ WHITE = (0, 0, 0)
 
 SQUAREBORDERCOLOR = BLACK
 
+# Window consts
 WINDOWBORDER = 50
 WINDOWWIDTH = 800
 WINDOWHEIGHT = 600

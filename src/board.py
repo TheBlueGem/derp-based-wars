@@ -15,40 +15,43 @@ def createBoard(width, height, display_surf):
 def drawBoard(board, surface):
     new_surf = surface.copy()
 
-    # new_surf.fill(BACKGROUNDCOLOR)
+    new_surf.fill(BACKGROUNDCOLOR)
     
-    # width = len(board)
-    # height = len(board[0])
+    width = len(board)
+    height = len(board[0])
 
-    # for x in range(width):
-    #         for y in range(height):
-    #             min_x, min_y = leftAndTopCoordsOfTile(x, y)
+    for x in range(width):
+            for y in range(height):
+                min_x, min_y = leftAndTopCoordsOfTile(x, y)
 
-    #             color = GREEN
+                color = GREEN
 
-    #             pygame.draw.rect(new_surf, color, (min_x, min_y, TILESIZE, TILESIZE))
+                pygame.draw.rect(new_surf, color, (min_x, min_y, TILESIZE, TILESIZE))
                 
-    #             pygame.draw.line(new_surf, SQUAREBORDERCOLOR, (min_x, min_y), (min_x + TILESIZE, min_y))
-    #             pygame.draw.line(new_surf, SQUAREBORDERCOLOR, (min_x, min_y), (min_x, min_y + TILESIZE))        
+                pygame.draw.line(new_surf, SQUAREBORDERCOLOR, (min_x, min_y), (min_x + TILESIZE, min_y))
+                pygame.draw.line(new_surf, SQUAREBORDERCOLOR, (min_x, min_y), (min_x, min_y + TILESIZE))        
 
-    #             if x + 1 == width:
-    #                 pygame.draw.line(new_surf, SQUAREBORDERCOLOR, (min_x, min_y + TILESIZE), (min_x + TILESIZE, min_y + TILESIZE))
-    #             if y + 1 == height:
-    #                 pygame.draw.line(new_surf, SQUAREBORDERCOLOR, (min_x + TILESIZE, min_y), (min_x + TILESIZE, min_y + TILESIZE))
+                if (x + 1) == width:
+                    pygame.draw.line(new_surf, SQUAREBORDERCOLOR, (min_x + TILESIZE, min_y), (min_x + TILESIZE, min_y + TILESIZE))
+                if (y + 1) == height:
+                    pygame.draw.line(new_surf, SQUAREBORDERCOLOR, (min_x, min_y + TILESIZE), (min_x + TILESIZE, min_y + TILESIZE))
 
     surface.blit(new_surf, (0, 0))
 
+# Set a tile on the board
 def setTile(x, y, color, board):
     board[x][y] = {
         'color': color
     }
     return board
 
+# Get the coordinates of the top left corner of a tile
 def leftAndTopCoordsOfTile(tile_x, tile_y):
     min_y = tile_y * TILESIZE
     min_x = tile_x * TILESIZE
     return (min_x, min_y)
 
+# Get a tile from the board
 def getTile(x, y, board):
     if board[x][y]:
         min_x, min_y = leftAndTopCoordsOfTile(x, y)

@@ -4,14 +4,15 @@ from pygame.locals import QUIT, KEYUP, K_ESCAPE
 from board import *
 from options import FPS
 
+# Main game loop
 def main():
     global FPSCLOCK, DISPLAYSURF
     pygame.init()
     FPSCLOCK = pygame.time.Clock()
     DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
 
-    board_width = 30
-    board_height = 30
+    board_width = 10
+    board_height = 10
 
     pygame.display.set_caption('Derp Based Wars')
 
