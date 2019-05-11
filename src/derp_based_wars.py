@@ -1,11 +1,13 @@
-import pygame, sys, board, common, options
+import pygame, sys, board, common, options, selector
 from pygame import init
 from pygame.locals import QUIT, KEYUP, K_ESCAPE
-from board import *
+from board import Board
 from options import FPS
 from units.unit import Unit
 from units.soldier import Soldier
 from units.unitFactory import UnitFactory
+from common import *
+from selector import Selector
 
 # Main game loop
 def main():
@@ -17,9 +19,12 @@ def main():
     board_width = 10
     board_height = 10
 
+    selector = Selector(None)
+
     pygame.display.set_caption('Derp Based Wars')
 
-    main_board = createBoard(board_width, board_height, DISPLAYSURF)
+    main_board = Board(board_width, board_height)
+    main_board.draw(DISPLAYSURF)
 
     # soldier = UnitFactory.createUnit("Soldier")
     # airShip = UnitFactory.createUnit("Airship")
@@ -29,8 +34,12 @@ def main():
             if event.type == QUIT or (event.type == KEYUP and event.key == K_ESCAPE):
                 pygame.quit()
                 sys.exit()
-        
-        drawBoard(main_board, DISPLAYSURF)
+
+        # Main drawing loop
+        new_surf = DISPLAYSURF.copy()
+        new_surf.fill(BACKGROUNDCOLOR)
+        main_board.draw(new_surf)
+        DISPLAYSURF.blit(new_surf, (0, 0))
         pygame.display.update()
         FPSCLOCK.tick(FPS)
 

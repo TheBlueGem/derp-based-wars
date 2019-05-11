@@ -1,62 +1,58 @@
-import sys, pygame
+import sys
+import pygame
+import tile
+import base_object
 from common import *
+from tile import Tile
+from base_object import BaseObject
 
-TILESIZE = 40
-BACKGROUNDCOLOR = GRAY
 
-def createBoard(width, height, display_surf):
-    board = [[0 for y in range(width)] for x in range(height)]
+class Board(BaseObject):
+    width = None
+    height = None
+    tilesize = None
+    backgroundColor = None
+    tiles = [[]]
 
-    drawBoard(board, display_surf)
+    def __init__(self, width, height):
+        self.tiles = [[0 for y in range(width)] for x in range(height)]
+        self.width = width
+        self.height = height
 
-    return board
-
-# Created on the assumption that the board will know the state of itself and what's on it
-def drawBoard(board, surface):
-    new_surf = surface.copy()
-
-    new_surf.fill(BACKGROUNDCOLOR)
-    
-    width = len(board)
-    height = len(board[0])
-
-    for x in range(width):
-            for y in range(height):
-                min_x, min_y = leftAndTopCoordsOfTile(x, y)
-
+    # Created on the assumption that the board will know the state of itself and what's on it
+    def draw(self, surface):
+        for x in range(self.width):
+            for y in range(self.height):
                 color = GREEN
+                min_x, min_y = self.getLeftTopTileCoords(x, y)
+                pygame.draw.rect(
+                    surface, color, (min_x, min_y, TILESIZE, TILESIZE))
+                pygame.draw.line(surface, SQUAREBORDERCOLOR,
+                                 (min_x, min_y), (min_x + TILESIZE, min_y))
+                pygame.draw.line(surface, SQUAREBORDERCOLOR,
+                                 (min_x, min_y), (min_x, min_y + TILESIZE))
 
-                pygame.draw.rect(new_surf, color, (min_x, min_y, TILESIZE, TILESIZE))
-                
-                pygame.draw.line(new_surf, SQUAREBORDERCOLOR, (min_x, min_y), (min_x + TILESIZE, min_y))
-                pygame.draw.line(new_surf, SQUAREBORDERCOLOR, (min_x, min_y), (min_x, min_y + TILESIZE))        
+                if (x + 1) == self.width:
+                    pygame.draw.line(surface, SQUAREBORDERCOLOR, (min_x +
+                                                                  TILESIZE, min_y), (min_x + TILESIZE, min_y + TILESIZE))
+                if (y + 1) == self.height:
+                    pygame.draw.line(surface, SQUAREBORDERCOLOR, (min_x,
+                                                                  min_y + TILESIZE), (min_x + TILESIZE, min_y + TILESIZE))
 
-                if (x + 1) == width:
-                    pygame.draw.line(new_surf, SQUAREBORDERCOLOR, (min_x + TILESIZE, min_y), (min_x + TILESIZE, min_y + TILESIZE))
-                if (y + 1) == height:
-                    pygame.draw.line(new_surf, SQUAREBORDERCOLOR, (min_x, min_y + TILESIZE), (min_x + TILESIZE, min_y + TILESIZE))
+    # Set a tile on the board
 
-    surface.blit(new_surf, (0, 0))
+    def setTile(self, x, y, color):
+        tile = Tile(color)
+        self.tiles[x][y] = tile
 
-# Set a tile on the board
-def setTile(x, y, color, board):
-    board[x][y] = {
-        'color': color
-    }
-    return board
+    # Get the coordinates of the top left corner of a tile
+    def getLeftTopTileCoords(self, tile_x, tile_y):
+        min_x = tile_x * TILESIZE
+        min_y = tile_y * TILESIZE
+        return (min_x, min_y)
 
-# Get the coordinates of the top left corner of a tile
-def leftAndTopCoordsOfTile(tile_x, tile_y):
-    min_y = tile_y * TILESIZE
-    min_x = tile_x * TILESIZE
-    return (min_x, min_y)
-
-# Get a tile from the board
-def getTile(x, y, board):
-    if board[x][y]:
-        min_x, min_y = leftAndTopCoordsOfTile(x, y)
-        tile = board[x][y]
-        tile['min_x'] = min_x
-        tile['min_y'] = min_y
-        return tile
-    return None
+    # Get a tile from the board
+    def getTile(self, x, y):
+        if self.tiles[x][y]:
+            return self.tiles[x][y]
+        return None

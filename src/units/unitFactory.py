@@ -5,7 +5,7 @@ from units.unit import Unit
 class UnitFactory: 
 
     @staticmethod
-    def createUnit(unitType: "Soldier" | "Airship") -> Unit:  
+    def createUnit(unitType: "Soldier" and "Airship") -> Unit:  
         if unitType == "Soldier":
             return Soldier()
         elif unitType == "Airship":
