@@ -26,8 +26,17 @@ def main():
     main_board = Board(board_width, board_height)
     main_board.draw(DISPLAYSURF)
 
-    # soldier = UnitFactory.createUnit("Soldier")
-    # airShip = UnitFactory.createUnit("Airship")
+    player1_units = [
+        UnitFactory.createUnit("Soldier"),
+        UnitFactory.createUnit("Soldier"),
+        UnitFactory.createUnit("Airship")]
+
+    player2_units = [
+        UnitFactory.createUnit("Soldier"),
+        UnitFactory.createUnit("Soldier"),
+        UnitFactory.createUnit("Airship")]
+
+    main_board.drawUnits(player1_units)
 
     while True:
         for event in pygame.event.get():

@@ -32,6 +32,7 @@ class Board(BaseObject):
                 pygame.draw.line(surface, SQUAREBORDERCOLOR,
                                  (min_x, min_y), (min_x, min_y + TILESIZE))
 
+                # For drawing the outer borders of the board
                 if (x + 1) == self.width:
                     pygame.draw.line(surface, SQUAREBORDERCOLOR, (min_x +
                                                                   TILESIZE, min_y), (min_x + TILESIZE, min_y + TILESIZE))
@@ -39,8 +40,11 @@ class Board(BaseObject):
                     pygame.draw.line(surface, SQUAREBORDERCOLOR, (min_x,
                                                                   min_y + TILESIZE), (min_x + TILESIZE, min_y + TILESIZE))
 
-    # Set a tile on the board
+    def drawUnits(self, units:[]):
+        for unit in units:
+            print(unit)
 
+    # Set a tile on the board
     def setTile(self, x, y, color):
         tile = Tile(color)
         self.tiles[x][y] = tile
