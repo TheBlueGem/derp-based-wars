@@ -2,6 +2,7 @@ import sys
 import pygame
 import tile
 import base_object
+import random
 from common import *
 from tile import Tile
 from base_object import BaseObject
@@ -13,6 +14,7 @@ class Board(BaseObject):
     tilesize = None
     backgroundColor = None
     tiles = [[]]
+    unitPositions = []
 
     def __init__(self, width, height):
         self.tiles = [[0 for y in range(width)] for x in range(height)]
@@ -40,9 +42,10 @@ class Board(BaseObject):
                     pygame.draw.line(surface, SQUAREBORDERCOLOR, (min_x,
                                                                   min_y + TILESIZE), (min_x + TILESIZE, min_y + TILESIZE))
 
-    def drawUnits(self, units:[]):
+    def initializeUnitPositions(self, units:[]):
         for unit in units:
-            print(unit)
+            randomTile = self.getRandomTile()
+            randomTile.units[0] = unit                     
 
     # Set a tile on the board
     def setTile(self, x, y, color):
@@ -60,3 +63,8 @@ class Board(BaseObject):
         if self.tiles[x][y]:
             return self.tiles[x][y]
         return None
+
+    def getRandomTile(self) -> Tile:
+        randomX = random.randint(0, self.width - 1)
+        randomY = random.randint(0, self.height - 1)
+        return self.tiles[randomX, randomY]

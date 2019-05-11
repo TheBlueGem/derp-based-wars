@@ -36,7 +36,7 @@ def main():
         UnitFactory.createUnit("Soldier"),
         UnitFactory.createUnit("Airship")]
 
-    main_board.drawUnits(player1_units)
+    main_board.initializeUnitPositions(player1_units + player2_units)
 
     while True:
         for event in pygame.event.get():
