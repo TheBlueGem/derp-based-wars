@@ -5,6 +5,7 @@ from board import *
 from options import FPS
 from units.unit import Unit
 from units.soldier import Soldier
+from units.unitFactory import UnitFactory
 
 # Main game loop
 def main():
@@ -19,6 +20,9 @@ def main():
     pygame.display.set_caption('Derp Based Wars')
 
     main_board = createBoard(board_width, board_height, DISPLAYSURF)
+
+    # soldier = UnitFactory.createUnit("Soldier")
+    # airShip = UnitFactory.createUnit("Airship")
 
     while True:
         for event in pygame.event.get():
