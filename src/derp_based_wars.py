@@ -1,9 +1,10 @@
-import pygame, sys, board, common, options
+import pygame, sys, board, common, options, selector
 from pygame import init
 from pygame.locals import QUIT, KEYUP, K_ESCAPE
 from board import Board
 from options import FPS
 from common import *
+from selector import Selector
 
 # Main game loop
 def main():
@@ -15,6 +16,8 @@ def main():
     board_width = 10
     board_height = 10
 
+    selector = Selector(None)
+
     pygame.display.set_caption('Derp Based Wars')
 
     main_board = Board(board_width, board_height)
@@ -25,8 +28,12 @@ def main():
             if event.type == QUIT or (event.type == KEYUP and event.key == K_ESCAPE):
                 pygame.quit()
                 sys.exit()
-        
-        main_board.draw(DISPLAYSURF)
+
+        # Main drawing loop
+        new_surf = DISPLAYSURF.copy()
+        new_surf.fill(BACKGROUNDCOLOR)
+        main_board.draw(new_surf)
+        DISPLAYSURF.blit(new_surf, (0, 0))
         pygame.display.update()
         FPSCLOCK.tick(FPS)
 
