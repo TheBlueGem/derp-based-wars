@@ -17,7 +17,7 @@ class Board(BaseObject):
     unitPositions = []
 
     def __init__(self, width, height):
-        self.tiles = [[0 for y in range(width)] for x in range(height)]
+        self.tiles = [[Tile for y in range(width)] for x in range(height)]
         self.width = width
         self.height = height
 
@@ -45,7 +45,7 @@ class Board(BaseObject):
     def initializeUnitPositions(self, units:[]):
         for unit in units:
             randomTile = self.getRandomTile()
-            randomTile.units[0] = unit                     
+            randomTile.units.append(unit)                    
 
     # Set a tile on the board
     def setTile(self, x, y, color):
@@ -67,4 +67,7 @@ class Board(BaseObject):
     def getRandomTile(self) -> Tile:
         randomX = random.randint(0, self.width - 1)
         randomY = random.randint(0, self.height - 1)
-        return self.tiles[randomX, randomY]
+
+        tile = self.tiles[randomY][randomX]
+
+        return tile
