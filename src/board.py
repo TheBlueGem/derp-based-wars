@@ -64,6 +64,7 @@ class Board(BaseObject):
             return self.tiles[x][y]
         return None
 
+    # Get a random tile from the board
     def getRandomTile(self) -> Tile:
         randomX = random.randint(0, self.width - 1)
         randomY = random.randint(0, self.height - 1)
