@@ -8,7 +8,6 @@ from common import TILESIZE, BLUE
 from base_object import BaseObject
 from typing import Optional, Tuple
 
-
 class Selector(BaseObject):
     _selected = Optional[Tuple[int, int]]
 

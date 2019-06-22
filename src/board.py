@@ -6,7 +6,6 @@ from common import *
 from tile import Tile
 from base_object import BaseObject
 
-
 class Board(BaseObject):
     width = None
     height = None
@@ -40,7 +39,6 @@ class Board(BaseObject):
                                                                   min_y + TILESIZE), (min_x + TILESIZE, min_y + TILESIZE))
 
     # Set a tile on the board
-
     def setTile(self, x, y, color):
         tile = Tile(color)
         self.tiles[x][y] = tile

@@ -12,8 +12,6 @@ from common import *
 from selector import Selector
 
 # Main game loop
-
-
 def main():
     global FPSCLOCK, DISPLAYSURF
     pygame.init()
@@ -44,7 +42,6 @@ def main():
         DISPLAYSURF.blit(new_surf, (0, 0))
         pygame.display.update()
         FPSCLOCK.tick(FPS)
-
 
 if __name__ == '__main__':
     main()
