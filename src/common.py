@@ -5,8 +5,11 @@ BLUE = (0, 0, 128)
 GREEN = (0, 155, 0)
 BLACK = (0, 0, 0)
 WHITE = (0, 0, 0)
+BACKGROUNDCOLOR = GRAY
 
+# Tile consts
 SQUAREBORDERCOLOR = BLACK
+TILESIZE = 40
 
 # Window consts
 WINDOWBORDER = 50
