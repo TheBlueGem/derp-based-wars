@@ -24,6 +24,7 @@ class Board(BaseObject):
             for y in range(self.height):
                 color = GREEN
                 min_x, min_y = self.getLeftTopTileCoords(x, y)
+                tile = self.getTile(x, y)
                 pygame.draw.rect(
                     surface, color, (min_x, min_y, TILESIZE, TILESIZE))
                 pygame.draw.line(surface, SQUAREBORDERCOLOR,
