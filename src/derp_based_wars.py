@@ -8,6 +8,9 @@ from pygame import init
 from pygame.locals import QUIT, KEYUP, K_ESCAPE
 from board import Board
 from options import FPS
+from units.unit import Unit
+from units.soldier import Soldier
+from units.unitFactory import UnitFactory
 from common import *
 from selector import Selector
 
@@ -27,6 +30,18 @@ def main():
     main_board.draw(DISPLAYSURF)
     selector = Selector(main_board.getLeftTopTileCoords(5,5))
     print(selector)
+
+    player1_units = [
+        UnitFactory.createUnit("Soldier"),
+        UnitFactory.createUnit("Soldier"),
+        UnitFactory.createUnit("Airship")]
+
+    player2_units = [
+        UnitFactory.createUnit("Soldier"),
+        UnitFactory.createUnit("Soldier"),
+        UnitFactory.createUnit("Airship")]
+
+    main_board.initializeUnitPositions(player1_units + player2_units)
 
     while True:
         for event in pygame.event.get():
