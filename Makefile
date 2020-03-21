@@ -10,4 +10,4 @@ venv: clean
 	$(V); pip install -r requirements.txt
 
 run:
-	py
+	python3 src/derp_based_wars.py
