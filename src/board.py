@@ -1,7 +1,5 @@
 from random import randint
-from typing import List
-from typing import Type
-from typing import Union
+from typing import Optional
 
 from pygame import draw as pygame_draw
 
@@ -18,12 +16,12 @@ class Board(BaseObject):
     height = None
     tile_size = None
     background_color = None
-    tiles = [[]]
+    tiles = []
     unit_positions = []
 
     def __init__(self, width: int, height: int):
         super().__init__()
-        self.tiles = [[Tile for y in range(width)] for x in range(height)]
+        self.tiles = [[Tile(GREEN) for y in range(width)] for x in range(height)]
         self.width = width
         self.height = height
 
@@ -63,8 +61,8 @@ class Board(BaseObject):
         return min_x, min_y
 
     # Get a tile from the board
-    def get_tile(self, x, y) -> Union[Type[Tile], List[Type[Tile]], None]:
-        if self.tiles[x][y]:
+    def get_tile(self, x, y) -> Optional[Tile]:
+        if isinstance(self.tiles[x][y], Tile):
             return self.tiles[x][y]
         return None
 
@@ -72,6 +70,6 @@ class Board(BaseObject):
     def get_random_tile(self) -> Tile:
         random_x = randint(0, self.width - 1)
         random_y = randint(0, self.height - 1)
-        tile = self.tiles[random_y][random_x]
+        tile = self.get_tile(random_y, random_x)
 
         return tile

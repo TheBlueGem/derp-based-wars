@@ -5,6 +5,7 @@ from pygame import display
 from pygame import init
 from pygame.locals import QUIT, KEYUP, K_ESCAPE
 from pygame import time
+from pygame import event as pygame_event
 
 from board import Board
 from options import FPS
@@ -24,9 +25,9 @@ def main():
 
     display.set_caption('Derp Based Wars')
 
-    main_board = Board(board_width, board_height)
-    main_board.draw(display_surf)
-    selector = Selector(main_board.getLeftTopTileCoords(5, 5))
+    main_board = Board(width=board_width, height=board_height)
+    main_board.draw(surface=display_surf)
+    selector = Selector(main_board.get_left_top_tile_coords(5, 5))
     print(selector)
 
     player1_units = [UnitFactory.createUnit("Soldier"), UnitFactory.createUnit("Soldier"),
@@ -35,10 +36,10 @@ def main():
     player2_units = [UnitFactory.createUnit("Soldier"), UnitFactory.createUnit("Soldier"),
                      UnitFactory.createUnit("Airship")]
 
-    main_board.initializeUnitPositions(player1_units + player2_units)
+    main_board.initialize_unit_positions(units=player1_units + player2_units)
 
     while True:
-        for event in event.get():
+        for event in pygame_event.get():
             if event.type == QUIT or (event.type == KEYUP and event.key == K_ESCAPE):
                 pygame_quit()
                 sys.exit()
