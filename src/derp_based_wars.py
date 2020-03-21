@@ -3,12 +3,12 @@ import sys
 from pygame import quit as pygame_quit
 from pygame import display
 from pygame import init
-from pygame.locals import QUIT, KEYUP, K_ESCAPE
+from pygame.locals import QUIT, KEYUP, K_ESCAPE, KEYDOWN, K_LEFT
 from pygame import time
 from pygame import event as pygame_event
 
 from board import Board
-from options import FPS
+from options import FPS, SELECTOR_DOWN, SELECTOR_LEFT, SELECTOR_RIGHT, SELECTOR_UP
 from units.unitFactory import UnitFactory
 from common import WINDOW_WIDTH, WINDOW_HEIGHT, BACKGROUND_COLOR
 from selector import Selector
@@ -27,7 +27,7 @@ def main():
 
     main_board = Board(width=board_width, height=board_height)
     main_board.draw(surface=display_surf)
-    selector = Selector(main_board.get_left_top_tile_coords(5, 5))
+    selector = Selector((5, 5))
     print(selector)
 
     player1_units = [UnitFactory.createUnit("Soldier"), UnitFactory.createUnit("Soldier"),
@@ -43,6 +43,19 @@ def main():
             if event.type == QUIT or (event.type == KEYUP and event.key == K_ESCAPE):
                 pygame_quit()
                 sys.exit()
+
+            if event.type == KEYDOWN and event.key == SELECTOR_LEFT and selector.get_selected()[0] is not 1:
+                selector.move(-1, 0)
+                print(selector)
+            if event.type == KEYDOWN and event.key == SELECTOR_RIGHT and selector.get_selected()[0] is not board_width:
+                selector.move(1, 0)
+                print(selector)
+            if event.type == KEYDOWN and event.key == SELECTOR_UP and selector.get_selected()[1] is not 1:
+                selector.move(0, -1)
+                print(selector)
+            if event.type == KEYDOWN and event.key == SELECTOR_DOWN and selector.get_selected()[1] is not board_height:
+                selector.move(0, 1)
+                print(selector)
 
         # Main drawing loop
         new_surf = display_surf.copy()

@@ -1,2 +1,9 @@
 # Game options
+from pygame.constants import K_LEFT, K_RIGHT, K_UP, K_DOWN
+
 FPS = 60
+
+SELECTOR_LEFT = K_LEFT
+SELECTOR_RIGHT = K_RIGHT
+SELECTOR_UP = K_UP
+SELECTOR_DOWN = K_DOWN
