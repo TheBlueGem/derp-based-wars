@@ -1,4 +1,6 @@
+import logging
 import sys
+import typing
 
 from pygame import quit as pygame_quit
 from pygame import display
@@ -6,8 +8,11 @@ from pygame import init
 from pygame.locals import QUIT, KEYUP, K_ESCAPE, KEYDOWN
 from pygame import time
 from pygame import event as pygame_event
+from pygame.rect import Rect
+from pygame.surface import Surface
 
 from board import Board
+from common import TILE_SIZE
 from options import FPS, SELECTOR_DOWN, SELECTOR_LEFT, SELECTOR_RIGHT, SELECTOR_UP
 from units.unitFactory import UnitFactory
 from common import WINDOW_WIDTH, WINDOW_HEIGHT, BACKGROUND_COLOR
@@ -16,18 +21,22 @@ from selector import Selector
 board_width = 10
 board_height = 10
 
+logging.getLogger()
+
 
 # Main game loop
 def main():
     init()
     fps_clock = time.Clock()
-    display_surf = display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+    display_surf = typing.cast(Surface, display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT)))
     display.set_caption('Derp Based Wars')
+    display_surf.fill(BACKGROUND_COLOR)
 
-    main_board = Board(width=board_width, height=board_height)
-    main_board.draw(surface=display_surf)
+    main_board = Board(width=board_width, height=board_height, surface=display_surf.copy().subsurface(
+        Rect(0, 0, board_width * TILE_SIZE + 1, board_height * TILE_SIZE + 1)))
+
+    main_board.draw()
     selector = Selector((5, 5))
-    print(selector)
 
     player1_units = [UnitFactory.createUnit("Soldier"), UnitFactory.createUnit("Soldier"),
                      UnitFactory.createUnit("Airship")]
@@ -46,13 +55,13 @@ def main():
             if event.type == KEYDOWN:
                 handle_keydown_event(event.key, selector)
 
-                # Main drawing loop
-        new_surf = display_surf.copy()
-        new_surf.fill(BACKGROUND_COLOR)
-        main_board.draw(new_surf)
+        # Main drawing loop
+        display_surf.fill(BACKGROUND_COLOR)
+        new_surf = main_board.draw()
         selector.draw(new_surf)
         display_surf.blit(new_surf, (0, 0))
         display.update()
+        
         fps_clock.tick(FPS)
 
 

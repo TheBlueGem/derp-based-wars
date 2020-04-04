@@ -18,6 +18,8 @@ class Selector(BaseObject):
         else:
             self._selected = (0, 0)
 
+        print(self)
+
     def __str__(self):
         return "Selector with selected tile: %d, %d" % self._selected
 
