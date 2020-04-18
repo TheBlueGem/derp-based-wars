@@ -7,5 +7,5 @@ class BaseObject(ABC):
         super().__init__()
 
     @abstractmethod
-    def draw(self, surface):
+    def draw(self):
         pass
