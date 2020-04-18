@@ -34,8 +34,8 @@ class Selector(BaseObject):
 
     def draw(self, surface) -> None:
         if self._selected is not None:
-            x = (self._selected[0] - 1) * TILE_SIZE
-            y = (self._selected[1] - 1) * TILE_SIZE
+            x = (self._selected[0]) * TILE_SIZE
+            y = (self._selected[1]) * TILE_SIZE
             line_length = (TILE_SIZE / 4)
             line_thiccness = 3
 

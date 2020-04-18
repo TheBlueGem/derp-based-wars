@@ -14,9 +14,10 @@ from pygame.surface import Surface
 from board import Board
 from common import TILE_SIZE
 from options import FPS, SELECTOR_DOWN, SELECTOR_LEFT, SELECTOR_RIGHT, SELECTOR_UP
-from units.unitFactory import UnitFactory
 from common import WINDOW_WIDTH, WINDOW_HEIGHT, BACKGROUND_COLOR
 from selector import Selector
+from tile import Tile
+from tile_objects.environment.grass import Grass
 
 board_width = 10
 board_height = 10
@@ -35,16 +36,12 @@ def main():
     main_board = Board(width=board_width, height=board_height, surface=display_surf.copy().subsurface(
         Rect(0, 0, board_width * TILE_SIZE + 1, board_height * TILE_SIZE + 1)))
 
+    for x in range(main_board.width):
+        for y in range(main_board.height):
+            main_board.set_tile(x, y, Tile(objects=[Grass()], surface=None))
+
     main_board.draw()
-    selector = Selector((5, 5))
-
-    player1_units = [UnitFactory.createUnit("Soldier"), UnitFactory.createUnit("Soldier"),
-                     UnitFactory.createUnit("Airship")]
-
-    player2_units = [UnitFactory.createUnit("Soldier"), UnitFactory.createUnit("Soldier"),
-                     UnitFactory.createUnit("Airship")]
-
-    main_board.initialize_unit_positions(units=player1_units + player2_units)
+    selector = Selector((4, 4))
 
     while True:
         for event in pygame_event.get():
@@ -65,14 +62,15 @@ def main():
         fps_clock.tick(FPS)
 
 
+
 def handle_keydown_event(event_key, selector):
-    if event_key == SELECTOR_LEFT and selector.get_selected()[0] is not 1:
+    if event_key == SELECTOR_LEFT and selector.get_selected()[0] is not 0:
         selector.move(-1, 0)
         print(selector)
     if event_key == SELECTOR_RIGHT and selector.get_selected()[0] is not board_width:
         selector.move(1, 0)
         print(selector)
-    if event_key == SELECTOR_UP and selector.get_selected()[1] is not 1:
+    if event_key == SELECTOR_UP and selector.get_selected()[1] is not 0:
         selector.move(0, -1)
         print(selector)
     if event_key == SELECTOR_DOWN and selector.get_selected()[1] is not board_height:
