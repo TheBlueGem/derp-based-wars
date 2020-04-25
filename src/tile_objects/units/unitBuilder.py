@@ -1,28 +1,45 @@
-from pygame.surface import Surface
-from pygame import draw as pygame_draw
-
-from common import RED
-from common import TILE_SIZE
-from tile_objects.base_tile_object import BaseTileObject
+from tile_objects.units.unit import Unit
 
 
-class Unit(BaseTileObject):
+# class BuildError(Exception):
+#     def __init__(self, attribute):
+#         super().__init__()
+#         self.message
+
+
+class UnitBuilder:
     _movement = None
     _moved = None
     _health_points = None
     _attack = None
     _strengths = []
     _statusses = []
+    _sprite = None
 
-    def __init__(self):
-        super().__init__()
+    def build(self) -> Unit:
+        unit = Unit()
+        if self.movement is not None:
+            unit.movement = self.movement
+        else:
+            raise Exception("Unit movement can't be None")
 
-    def draw(self, surface: Surface):
-        quarter = TILE_SIZE / 4
-        pygame_draw.line(surface, RED, (quarter, quarter),
-                         (quarter * 3, quarter * 3), 3)
-        pygame_draw.line(surface, RED, (quarter * 3, quarter),
-                         (quarter, quarter * 3), 3)
+        unit.moved = self.moved if self.moved is not None else False
+
+        if self.health_points is not None:
+            unit.health_points = self.health_points
+        else:
+            raise Exception("Unit health points can't be None")
+
+        if self.attack is not None:
+            unit.attack = self.attack
+        else:
+            raise Exception("Unit attack can't be None")
+
+        unit.statusses = self.strengths
+        unit.statusses = self.statusses
+        unit.sprite = self.sprite
+
+        return unit
 
     @property
     def movement(self):
@@ -71,3 +88,11 @@ class Unit(BaseTileObject):
     @statusses.setter
     def statusses(self, statusses):
         self._statusses = statusses
+
+    @property
+    def sprite(self):
+        return self._sprite
+
+    @sprite.setter
+    def sprite(self, sprite):
+        self._sprite = sprite
