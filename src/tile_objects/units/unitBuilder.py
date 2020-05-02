@@ -39,6 +39,8 @@ class UnitBuilder:
         unit.statusses = self.statusses
         unit.sprite = self.sprite
 
+        print("Creating unit with stats: " + str(self))
+
         return unit
 
     @property

@@ -1,7 +1,7 @@
 from pygame.surface import Surface
 from pygame import draw as pygame_draw
 
-from common import RED
+from common import YELLOW
 from common import TILE_SIZE
 from tile_objects.base_tile_object import BaseTileObject
 
@@ -19,9 +19,9 @@ class Unit(BaseTileObject):
 
     def draw(self, surface: Surface):
         quarter = TILE_SIZE / 4
-        pygame_draw.line(surface, RED, (quarter, quarter),
+        pygame_draw.line(surface, YELLOW, (quarter, quarter),
                          (quarter * 3, quarter * 3), 3)
-        pygame_draw.line(surface, RED, (quarter * 3, quarter),
+        pygame_draw.line(surface, YELLOW, (quarter * 3, quarter),
                          (quarter, quarter * 3), 3)
 
     @property
