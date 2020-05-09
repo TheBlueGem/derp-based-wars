@@ -56,7 +56,7 @@ def main():
                 sys.exit()
 
             if event.type == KEYDOWN:
-                handle_keydown_event(event.key, selector)
+                handle_keydown_event(event.key, selector, main_board)
 
         # Main drawing loop
         display_surf.fill(BACKGROUND_COLOR)
@@ -68,7 +68,7 @@ def main():
         fps_clock.tick(FPS)
 
 
-def handle_keydown_event(event_key, selector):
+def handle_keydown_event(event_key, selector: Selector, board: Board):
     if event_key == SELECTOR_LEFT and selector.location[0] is not 0:
         selector.move(-1, 0)
     if event_key == SELECTOR_RIGHT and selector.location[0] is not board_width - 1:
@@ -78,7 +78,20 @@ def handle_keydown_event(event_key, selector):
     if event_key == SELECTOR_DOWN and selector.location[1] is not board_height - 1:
         selector.move(0, 1)
     if event_key == SELECTOR_SELECT:
-        selector.toggle_select()
+        if len(selector.selected_route) > 0:
+            route_start = selector.selected_route[0]
+            route_destination = selector.get_selected_destination()
+            start_tile = board.get_tile(route_start[0], route_start[1])
+            unit = start_tile.pop_unit()
+            destination_tile = board.get_tile(route_destination[0], route_destination[1])
+            destination_tile.objects.append(unit)
+            selector.toggle_select()
+
+        else:
+            tile = board.get_tile(selector.location[0], selector.location[1])
+            unit = tile.get_unit()
+            if unit is not None:
+                selector.toggle_select()
 
 
 if __name__ == '__main__':

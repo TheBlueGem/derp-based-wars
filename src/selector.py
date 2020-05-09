@@ -54,7 +54,7 @@ def draw_selection_arrow(surface: Surface, tile: Tuple[int, int], selection_dire
 
 class Selector(ABC):
     _location = Tuple[int, int]
-    _selected = list()
+    _selected_route = list()
     _line_thiccness = 3
 
     def __init__(self, location):
@@ -65,7 +65,7 @@ class Selector(ABC):
         else:
             self._location = (0, 0)
 
-        self._selected = []
+        self._selected_route = []
 
         print(self)
 
@@ -80,34 +80,41 @@ class Selector(ABC):
     def location(self, location) -> None:
         self._location = location
 
+    @property
+    def selected_route(self) -> list:
+        return self._selected_route
+
     def move(self, x: int, y: int) -> None:
         self._location = (self._location[0] + x, self._location[1] + y)
         self.select()
 
     def toggle_select(self) -> None:
-        if len(self._selected) is 0:
-            self._selected.append(self._location)
-            print("Selecting")
+        if len(self._selected_route) is 0:
+            self._selected_route.append(self._location)
+            print("Selected")
         else:
-            self._selected = []
-            print("Deselecting")
+            self._selected_route = []
+            print("Deselected")
 
     def select(self) -> None:
-        if len(self._selected) > 0:
-            if self._location in self._selected:
+        if len(self._selected_route) > 0:
+            if self._location in self._selected_route:
                 print("Trimming selection")
                 trimmed_selection = []
-                for tile in self._selected:
+                for tile in self._selected_route:
                     trimmed_selection.append(tile)
                     if tile == self._location:
-                        self._selected = trimmed_selection
+                        self._selected_route = trimmed_selection
                         return
             else:
-                self._selected.append(self._location)
+                self._selected_route.append(self._location)
+
+    def get_selected_destination(self) -> Tuple[int, int]:
+        return self._selected_route[len(self._selected_route) - 1]
 
     def draw_selection(self, surface: Surface) -> None:
-        if len(self._selected) > 1:
-            iterator = iter(self._selected)
+        if len(self._selected_route) > 1:
+            iterator = iter(self._selected_route)
             selection_direction = None
             src_tile = next(iterator)
             dest_tile = next(iterator)
