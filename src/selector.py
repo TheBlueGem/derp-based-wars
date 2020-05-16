@@ -1,11 +1,15 @@
 from abc import ABC
+from typing import Optional
 
 import pygame
 from pygame.surface import Surface
 
+from common import LIGHTISH_BLUE
 from common import TILE_SIZE
 from common import BLUE
 from typing import Tuple
+
+from tile_objects.units.unit import Unit
 
 UP = 0
 RIGHT = 1
@@ -55,6 +59,7 @@ def draw_selection_arrow(surface: Surface, tile: Tuple[int, int], selection_dire
 class Selector(ABC):
     _location = Tuple[int, int]
     _selected_route = list()
+    _selected_movement = list()
     _line_thiccness = 3
 
     def __init__(self, location):
@@ -84,16 +89,28 @@ class Selector(ABC):
     def selected_route(self) -> list:
         return self._selected_route
 
+    @property
+    def selected_movement(self) -> list:
+        return self._selected_movement
+
+    @selected_movement.setter
+    def selected_movement(self, selected_movement):
+        self._selected_movement = selected_movement
+
     def move(self, x: int, y: int) -> None:
-        self._location = (self._location[0] + x, self._location[1] + y)
+        self._location = (self.location[0] + x, self.location[1] + y)
+        print(str(self))
         self.select()
 
-    def toggle_select(self) -> None:
-        if len(self._selected_route) is 0:
+    def toggle_select(self, unit: Optional[Unit]) -> None:
+        if len(self._selected_route) is 0 and unit is not None:
             self._selected_route.append(self._location)
+            self._selected_movement = self.get_selected_movement(unit)
+            print(self._selected_movement)
             print("Selected")
         else:
             self._selected_route = []
+            self._selected_movement = []
             print("Deselected")
 
     def select(self) -> None:
@@ -111,6 +128,26 @@ class Selector(ABC):
 
     def get_selected_destination(self) -> Tuple[int, int]:
         return self._selected_route[len(self._selected_route) - 1]
+
+    def handle_x_selection(self, movement: int, y_delta: int, selected_movement: list):
+        next_location = (self._location[0], self._location[1] + y_delta)
+        selected_movement.append(next_location)
+        for j in range(0, movement - abs(y_delta)):
+            x_steps = j + 1
+            x_location = (next_location[0] - x_steps, next_location[1])
+            selected_movement.append(x_location)
+            x_location = (next_location[0] + x_steps, next_location[1])
+            selected_movement.append(x_location)
+
+    def get_selected_movement(self, unit: Unit):
+        movement = unit.movement
+        selected_movement = list()
+        for i in range(0, (movement + 1)):
+            self.handle_x_selection(movement, -i, selected_movement)
+            if i + 1 < movement + 1:
+                self.handle_x_selection(movement, i + 1, selected_movement)
+
+        return selected_movement
 
     def draw_selection(self, surface: Surface) -> None:
         if len(self._selected_route) > 1:
@@ -146,6 +183,13 @@ class Selector(ABC):
 
             draw_selection_arrow(surface, src_tile, selection_direction)
 
+    def draw_selected_movement(self, surface: Surface):
+        for tup in self._selected_movement:
+            selection_surf: Surface = Surface((TILE_SIZE, TILE_SIZE))
+            selection_surf.fill(LIGHTISH_BLUE)
+            selection_surf.set_alpha(100)
+            surface.blit(selection_surf, (tup[0] * TILE_SIZE, tup[1] * TILE_SIZE))
+
     def draw(self, surface: Surface) -> None:
         if self._location is not None:
             x = (self._location[0]) * TILE_SIZE
@@ -167,4 +211,5 @@ class Selector(ABC):
             pygame.draw.line(surface, BLUE, (x + TILE_SIZE, y + TILE_SIZE),
                              (x + TILE_SIZE, y + TILE_SIZE - line_length), self._line_thiccness)
 
+            self.draw_selected_movement(surface)
             self.draw_selection(surface)

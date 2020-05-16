@@ -1,6 +1,5 @@
 import logging
 import sys
-import typing
 
 from pygame import quit as pygame_quit
 from pygame import display
@@ -31,7 +30,7 @@ logging.getLogger()
 def main():
     init()
     fps_clock = time.Clock()
-    display_surf = typing.cast(Surface, display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT)))
+    display_surf: Surface = display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     display.set_caption('Derp Based Wars')
     display_surf.fill(BACKGROUND_COLOR)
 
@@ -49,6 +48,7 @@ def main():
     main_board.draw()
     selector = Selector((4, 4))
 
+    print(display_surf.get_flags())
     while True:
         for event in pygame_event.get():
             if event.type == QUIT or (event.type == KEYUP and event.key == K_ESCAPE):
@@ -64,7 +64,7 @@ def main():
         selector.draw(new_surf)
         display_surf.blit(new_surf, (0, 0))
         display.update()
-        
+
         fps_clock.tick(FPS)
 
 
@@ -85,13 +85,13 @@ def handle_keydown_event(event_key, selector: Selector, board: Board):
             unit = start_tile.pop_unit()
             destination_tile = board.get_tile(route_destination[0], route_destination[1])
             destination_tile.objects.append(unit)
-            selector.toggle_select()
+            selector.toggle_select(None)
 
         else:
             tile = board.get_tile(selector.location[0], selector.location[1])
             unit = tile.get_unit()
             if unit is not None:
-                selector.toggle_select()
+                selector.toggle_select(unit)
 
 
 if __name__ == '__main__':
