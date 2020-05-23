@@ -10,6 +10,7 @@ from common import BLUE
 from typing import Tuple
 
 from tile_objects.units.unit import Unit
+from utils import check_if_tuple_in_list
 
 UP = 0
 RIGHT = 1
@@ -98,9 +99,11 @@ class Selector(ABC):
         self._selected_movement = selected_movement
 
     def move(self, x: int, y: int) -> None:
-        self._location = (self.location[0] + x, self.location[1] + y)
-        print(str(self))
-        self.select()
+        new_location = (self.location[0] + x, self.location[1] + y)
+        if len(self._selected_movement) == 0 or check_if_tuple_in_list(new_location, self._selected_movement):
+            self._location = new_location
+            print(str(self))
+            self.select()
 
     def toggle_select(self, unit: Optional[Unit]) -> None:
         if len(self._selected_route) is 0 and unit is not None:
@@ -113,14 +116,54 @@ class Selector(ABC):
             self._selected_movement = []
             print("Deselected")
 
+    def get_surroundings(self):
+        surroundings = list()
+        previous_selection = self._selected_route[len(self._selected_route) - 1]
+
+        current = (self.location[0] + 1, self.location[1])
+        if current != previous_selection and check_if_tuple_in_list(current, self._selected_route):
+            surroundings.append(current)
+
+        current = (self.location[0] - 1, self.location[1])
+        if current != previous_selection and check_if_tuple_in_list(current, self._selected_route):
+            surroundings.append(current)
+
+        current = (self.location[0], self.location[1] + 1)
+        if current != previous_selection and check_if_tuple_in_list(current, self._selected_route):
+            surroundings.append(current)
+
+        current = (self.location[0], self.location[1] - 1)
+        if current != previous_selection and check_if_tuple_in_list(current, self._selected_route):
+            surroundings.append(current)
+
+        print("Surroundings: " + str(surroundings))
+        return surroundings
+
+    def get_lowest_index_prev_location(self, surroundings: list) -> Optional[Tuple[int, int]]:
+        current_lowest = 100
+        lowest: Optional[Tuple[int, int]] = None
+        for el in surroundings:
+            if el in self._selected_route and self._selected_route.index(el) < current_lowest:
+                current_lowest = self._selected_route.index(el)
+                lowest = el
+        return lowest
+
     def select(self) -> None:
         if len(self._selected_route) > 0:
-            if self._location in self._selected_route:
-                print("Trimming selection")
+            if self._location == self._selected_route[0]:
+                print("Reset selection")
+                self._selected_route = [self._location]
+                return
+
+            surroundings = self.get_surroundings()
+            prev_location = self.get_lowest_index_prev_location(surroundings)
+            if prev_location is not None :
+                print("Trimming on prev selection")
                 trimmed_selection = []
                 for tile in self._selected_route:
                     trimmed_selection.append(tile)
-                    if tile == self._location:
+                    if tile == prev_location:
+                        trimmed_selection.append(self._location)
                         self._selected_route = trimmed_selection
                         return
             else:

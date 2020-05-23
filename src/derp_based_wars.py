@@ -48,7 +48,7 @@ def main():
     main_board.draw()
     selector = Selector((4, 4))
 
-    print(display_surf.get_flags())
+    # print(display_surf.get_flags())
     while True:
         for event in pygame_event.get():
             if event.type == QUIT or (event.type == KEYUP and event.key == K_ESCAPE):
