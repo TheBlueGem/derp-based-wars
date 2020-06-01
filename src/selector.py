@@ -10,7 +10,7 @@ from common import BLUE
 from typing import Tuple
 
 from tile_objects.units.unit import Unit
-from utils import check_if_tuple_in_list
+from utils import tuple_in_list
 
 UP = 0
 RIGHT = 1
@@ -60,7 +60,8 @@ def draw_selection_arrow(surface: Surface, tile: Tuple[int, int], selection_dire
 class Selector(ABC):
     _location = Tuple[int, int]
     _selected_route = list()
-    _selected_movement = list()
+    _selected_movement_grid = list()
+    _selected_movement = 0
     _line_thiccness = 3
 
     def __init__(self, location):
@@ -91,49 +92,61 @@ class Selector(ABC):
         return self._selected_route
 
     @property
-    def selected_movement(self) -> list:
+    def selected_movement(self) -> int:
         return self._selected_movement
 
     @selected_movement.setter
     def selected_movement(self, selected_movement):
         self._selected_movement = selected_movement
 
+    @property
+    def selected_movement_grid(self) -> list:
+        return self._selected_movement_grid
+
+    @selected_movement_grid.setter
+    def selected_movement_grid(self, selected_movement_grid):
+        self._selected_movement_grid = selected_movement_grid
+
     def move(self, x: int, y: int) -> None:
         new_location = (self.location[0] + x, self.location[1] + y)
-        if len(self._selected_movement) == 0 or check_if_tuple_in_list(new_location, self._selected_movement):
+        if self._selected_movement == 0:
             self._location = new_location
-            print(str(self))
-            self.select()
+        elif tuple_in_list(new_location, self._selected_movement_grid):
+            self.update_selected_route(new_location)
+
+        print(str(self))
 
     def toggle_select(self, unit: Optional[Unit]) -> None:
         if len(self._selected_route) is 0 and unit is not None:
             self._selected_route.append(self._location)
-            self._selected_movement = self.get_selected_movement(unit)
-            print(self._selected_movement)
+            self._selected_movement_grid = self.get_unit_movement_grid(unit)
+            self._selected_movement = unit.movement
+            print(self._selected_movement_grid)
             print("Selected")
         else:
             self._selected_route = []
-            self._selected_movement = []
+            self._selected_movement_grid = []
+            self._selected_movement = 0
             print("Deselected")
 
-    def get_surroundings(self):
+    def get_surroundings(self, new_location: Tuple[int, int]):
         surroundings = list()
         previous_selection = self._selected_route[len(self._selected_route) - 1]
 
-        current = (self.location[0] + 1, self.location[1])
-        if current != previous_selection and check_if_tuple_in_list(current, self._selected_route):
+        current = (new_location[0] + 1, new_location[1])
+        if current != previous_selection and tuple_in_list(current, self._selected_route):
             surroundings.append(current)
 
-        current = (self.location[0] - 1, self.location[1])
-        if current != previous_selection and check_if_tuple_in_list(current, self._selected_route):
+        current = (new_location[0] - 1, new_location[1])
+        if current != previous_selection and tuple_in_list(current, self._selected_route):
             surroundings.append(current)
 
-        current = (self.location[0], self.location[1] + 1)
-        if current != previous_selection and check_if_tuple_in_list(current, self._selected_route):
+        current = (new_location[0], new_location[1] + 1)
+        if current != previous_selection and tuple_in_list(current, self._selected_route):
             surroundings.append(current)
 
-        current = (self.location[0], self.location[1] - 1)
-        if current != previous_selection and check_if_tuple_in_list(current, self._selected_route):
+        current = (new_location[0], new_location[1] - 1)
+        if current != previous_selection and tuple_in_list(current, self._selected_route):
             surroundings.append(current)
 
         print("Surroundings: " + str(surroundings))
@@ -148,26 +161,28 @@ class Selector(ABC):
                 lowest = el
         return lowest
 
-    def select(self) -> None:
-        if len(self._selected_route) > 0:
-            if self._location == self._selected_route[0]:
-                print("Reset selection")
-                self._selected_route = [self._location]
-                return
+    def update_selected_route(self, new_location: Tuple[int, int]) -> None:
+        if new_location == self._selected_route[0]:
+            print("Reset selection")
+            self._selected_route = [new_location]
+            self._location = new_location
+            return
 
-            surroundings = self.get_surroundings()
-            prev_location = self.get_lowest_index_prev_location(surroundings)
-            if prev_location is not None :
-                print("Trimming on prev selection")
-                trimmed_selection = []
-                for tile in self._selected_route:
-                    trimmed_selection.append(tile)
-                    if tile == prev_location:
-                        trimmed_selection.append(self._location)
-                        self._selected_route = trimmed_selection
-                        return
-            else:
-                self._selected_route.append(self._location)
+        surroundings = self.get_surroundings(new_location)
+        prev_location = self.get_lowest_index_prev_location(surroundings)
+        if prev_location is not None:
+            print("Trimming on prev selection")
+            trimmed_selection = []
+            for tile in self._selected_route:
+                trimmed_selection.append(tile)
+                if tile == prev_location:
+                    trimmed_selection.append(new_location)
+                    self._selected_route = trimmed_selection
+                    self._location = new_location
+                    return
+        if len(self._selected_route) <= self._selected_movement:
+            self._selected_route.append(new_location)
+            self._location = new_location
 
     def get_selected_destination(self) -> Tuple[int, int]:
         return self._selected_route[len(self._selected_route) - 1]
@@ -182,7 +197,7 @@ class Selector(ABC):
             x_location = (next_location[0] + x_steps, next_location[1])
             selected_movement.append(x_location)
 
-    def get_selected_movement(self, unit: Unit):
+    def get_unit_movement_grid(self, unit: Unit):
         movement = unit.movement
         selected_movement = list()
         for i in range(0, (movement + 1)):
@@ -227,7 +242,7 @@ class Selector(ABC):
             draw_selection_arrow(surface, src_tile, selection_direction)
 
     def draw_selected_movement(self, surface: Surface):
-        for tup in self._selected_movement:
+        for tup in self._selected_movement_grid:
             selection_surf: Surface = Surface((TILE_SIZE, TILE_SIZE))
             selection_surf.fill(LIGHTISH_BLUE)
             selection_surf.set_alpha(100)

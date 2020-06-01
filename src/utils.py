@@ -1,7 +1,7 @@
 from typing import Tuple
 
 
-def check_if_tuple_in_list(tup: Tuple[int, int], li) -> bool:
+def tuple_in_list(tup: Tuple[int, int], li) -> bool:
     for elem in li:
         if elem == tup:
             return True
