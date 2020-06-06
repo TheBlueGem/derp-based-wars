@@ -1,14 +1,10 @@
-from common import GREEN
+from common import GRAY
 from tile_objects.environment.environment import Environment
 from tile_objects.environment.environmentBuilder import EnvironmentBuilder
 
 
-def grass() -> Environment:
+def mountain() -> Environment:
     builder = EnvironmentBuilder()
-    builder.background_color = GREEN
-    builder.movement_cost = 1
+    builder.background_color = GRAY
+    builder.movement_cost = 3
     return builder.build()
-
-
-
-

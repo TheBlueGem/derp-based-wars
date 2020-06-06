@@ -22,12 +22,3 @@ class BaseTileObject(ABC):
     @sprite.setter
     def sprite(self, sprite: str):
         self._sprite = sprite
-
-    # TODO create environment builder and move background_color to environment object
-    @property
-    def background_color(self):
-        return self._background_color
-
-    @background_color.setter
-    def background_color(self, color):
-        self._background_color = color

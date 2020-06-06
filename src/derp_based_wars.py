@@ -17,7 +17,9 @@ from common import WINDOW_WIDTH, WINDOW_HEIGHT, BACKGROUND_COLOR
 from options import SELECTOR_SELECT
 from selector import Selector
 from tile import Tile
-from tile_objects.environment.grass import Grass
+from tile_objects.environment.forest import forest
+from tile_objects.environment.grass import grass
+from tile_objects.environment.mountain import mountain
 from tile_objects.units.spear import spear
 
 board_width = 10
@@ -39,7 +41,12 @@ def main():
 
     for x in range(main_board.width):
         for y in range(main_board.height - 1):
-            main_board.set_tile(x, y, Tile(objects=[Grass()], surface=None))
+            if y % 2 and x % 2:
+                main_board.set_tile(x, y, Tile(objects=[forest()], surface=None))
+            elif y % 3 and x % 3:
+                main_board.set_tile(x, y, Tile(objects=[mountain()], surface=None))
+            else:
+                main_board.set_tile(x, y, Tile(objects=[grass()], surface=None))
 
     tile = main_board.get_tile(3, 3)
     tile.objects.append(spear())
