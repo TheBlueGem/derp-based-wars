@@ -129,60 +129,8 @@ class Selector(ABC):
             self._selected_movement = 0
             print("Deselected")
 
-    def get_surroundings(self, new_location: Tuple[int, int]):
-        surroundings = list()
-        previous_selection = self._selected_route[len(self._selected_route) - 1]
-
-        current = (new_location[0] + 1, new_location[1])
-        if current != previous_selection and tuple_in_list(current, self._selected_route):
-            surroundings.append(current)
-
-        current = (new_location[0] - 1, new_location[1])
-        if current != previous_selection and tuple_in_list(current, self._selected_route):
-            surroundings.append(current)
-
-        current = (new_location[0], new_location[1] + 1)
-        if current != previous_selection and tuple_in_list(current, self._selected_route):
-            surroundings.append(current)
-
-        current = (new_location[0], new_location[1] - 1)
-        if current != previous_selection and tuple_in_list(current, self._selected_route):
-            surroundings.append(current)
-
-        print("Surroundings: " + str(surroundings))
-        return surroundings
-
-    def get_lowest_index_prev_location(self, surroundings: list) -> Optional[Tuple[int, int]]:
-        current_lowest = 100
-        lowest: Optional[Tuple[int, int]] = None
-        for el in surroundings:
-            if el in self._selected_route and self._selected_route.index(el) < current_lowest:
-                current_lowest = self._selected_route.index(el)
-                lowest = el
-        return lowest
 
     def update_selected_route(self, new_location: Tuple[int, int]) -> None:
-        if new_location == self._selected_route[0]:
-            print("Reset selection")
-            self._selected_route = [new_location]
-            self._location = new_location
-            return
-
-        surroundings = self.get_surroundings(new_location)
-        prev_location = self.get_lowest_index_prev_location(surroundings)
-        if prev_location is not None:
-            print("Trimming on prev selection")
-            trimmed_selection = []
-            for tile in self._selected_route:
-                trimmed_selection.append(tile)
-                if tile == prev_location:
-                    trimmed_selection.append(new_location)
-                    self._selected_route = trimmed_selection
-                    self._location = new_location
-                    return
-        if len(self._selected_route) <= self._selected_movement:
-            self._selected_route.append(new_location)
-            self._location = new_location
 
     def get_selected_destination(self) -> Tuple[int, int]:
         return self._selected_route[len(self._selected_route) - 1]

@@ -12,6 +12,7 @@ from pygame.surface import Surface
 
 from board import Board
 from common import TILE_SIZE
+from movement_grid import get_movement_grid
 from options import FPS, SELECTOR_DOWN, SELECTOR_LEFT, SELECTOR_RIGHT, SELECTOR_UP
 from common import WINDOW_WIDTH, WINDOW_HEIGHT, BACKGROUND_COLOR
 from options import SELECTOR_SELECT
@@ -95,10 +96,10 @@ def handle_keydown_event(event_key, selector: Selector, board: Board):
             selector.toggle_select(None)
 
         else:
-            tile = board.get_tile(selector.location[0], selector.location[1])
-            unit = tile.get_unit()
+            unit = board.get_tile(selector.location[0], selector.location[1]).get_unit()
             if unit is not None:
-                selector.toggle_select(unit)
+                selector.toggle_select(unit, get_movement_grid((selector.location[0], selector.location[1]), unit,
+                                                              board))
 
 
 if __name__ == '__main__':
