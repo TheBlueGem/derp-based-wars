@@ -8,6 +8,7 @@ from base_object import BaseObject
 from common import RED
 from common import TILE_SIZE
 from tile_objects.base_tile_object import BaseTileObject
+from tile_objects.environment.environment import Environment
 from tile_objects.units.unit import Unit
 
 logger = logging.getLogger('Tile')
@@ -56,14 +57,22 @@ class Tile(BaseObject):
     def objects(self, objects):
         self._objects = objects
 
-    def get_unit(self) -> Optional[Unit]:
+    def get_units(self) -> [Unit]:
+        result = list()
         for obj in self._objects:
             if isinstance(obj, Unit):
-                return obj
-        return None
+                result.append(obj)
+        return result
 
     def pop_unit(self) -> Optional[Unit]:
         for index in range(len(self._objects)):
             if isinstance(self._objects[index], Unit):
                 return self._objects.pop(index)
         return None
+
+    def get_envs(self) -> [Environment]:
+        result = list()
+        for obj in self._objects:
+            if isinstance(obj, Environment):
+                result.append(obj)
+        return result

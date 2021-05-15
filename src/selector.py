@@ -4,11 +4,14 @@ from typing import Optional
 import pygame
 from pygame.surface import Surface
 
+from board import Board
 from common import LIGHTISH_BLUE
 from common import TILE_SIZE
 from common import BLUE
 from typing import Tuple
 
+from tile import Tile
+from tile_objects.environment.environment import Environment
 from tile_objects.units.unit import Unit
 from utils import tuple_in_list
 
@@ -27,6 +30,16 @@ def calc_selection_direction(src_tile: Tuple[int, int], dest_tile: Tuple[int, in
         return DOWN
     if src_tile[0] > dest_tile[0]:
         return LEFT
+
+
+def get_surroundings(location: Tuple[int, int], board: Board) -> [Tuple[int, int]]:
+    surroundings = list()
+    surroundings.append(board.get_tile(location[0], location[1] - 1))
+    surroundings.append(board.get_tile(location[0] + 1, location[1]))
+    surroundings.append(board.get_tile(location[0], location[1] + 1))
+    surroundings.append(board.get_tile(location[0] - 1, location[1]))
+
+    return surroundings
 
 
 def draw_selection_arrow(surface: Surface, tile: Tuple[int, int], selection_direction: int) -> None:
@@ -116,10 +129,10 @@ class Selector(ABC):
 
         print(str(self))
 
-    def toggle_select(self, unit: Optional[Unit]) -> None:
+    def toggle_select(self, unit: Optional[Unit], board: Board) -> None:
         if len(self._selected_route) is 0 and unit is not None:
             self._selected_route.append(self._location)
-            self._selected_movement_grid = self.get_unit_movement_grid(unit)
+            self._selected_movement_grid = self.get_unit_movement_grid(unit, board)
             self._selected_movement = unit.movement
             print(self._selected_movement_grid)
             print("Selected")
@@ -187,23 +200,30 @@ class Selector(ABC):
     def get_selected_destination(self) -> Tuple[int, int]:
         return self._selected_route[len(self._selected_route) - 1]
 
-    def handle_x_selection(self, movement: int, y_delta: int, selected_movement: list):
-        next_location = (self._location[0], self._location[1] + y_delta)
-        selected_movement.append(next_location)
-        for j in range(0, movement - abs(y_delta)):
-            x_steps = j + 1
-            x_location = (next_location[0] - x_steps, next_location[1])
-            selected_movement.append(x_location)
-            x_location = (next_location[0] + x_steps, next_location[1])
-            selected_movement.append(x_location)
+    # def handle_x_selection(self, movement: int, y_delta: int, selected_movement: list):
+    #     next_location = (self._location[0], self._location[1] + y_delta)
+    #     selected_movement.append(next_location)
+    #     for j in range(0, movement - abs(y_delta)):
+    #         x_steps = j + 1
+    #         x_location = (next_location[0] - x_steps, next_location[1])
+    #         selected_movement.append(x_location)
+    #         x_location = (next_location[0] + x_steps, next_location[1])
+    #         selected_movement.append(x_location)
 
-    def get_unit_movement_grid(self, unit: Unit):
+    def get_unit_movement_grid(self, unit: Unit, board: Board):
         movement = unit.movement
         selected_movement = list()
-        for i in range(0, (movement + 1)):
-            self.handle_x_selection(movement, -i, selected_movement)
-            if i + 1 < movement + 1:
-                self.handle_x_selection(movement, i + 1, selected_movement)
+        for i in range(0, movement):
+            surroundings: list = get_surroundings(self._location + movement, board)
+
+            for tile in surroundings:
+                if tile is not None:
+                    envs = tile.get_envs()
+                    if len(envs) > 0:
+                        # TODO Netjes vakjes afgaan om paden te bepalen. Mind you dat het kortste pad altijd de waarheid is
+                        selected_movement.append(envs[0].movement_cost())
+            # self.handle_x_selection(movement, -i, selected_movement)
+            # self.handle_x_selection(movement, i + 1, selected_movement)
 
         return selected_movement
 

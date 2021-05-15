@@ -11,18 +11,8 @@ class EnvironmentBuilder:
         environment.background_color = self._background_color
         return environment
 
-    @property
-    def background_color(self):
-        return self._background_color
-
-    @background_color.setter
-    def background_color(self, color):
+    def set_background_color(self, color):
         self._background_color = color
 
-    @property
-    def movement_cost(self):
-        return self._movement_cost
-
-    @movement_cost.setter
-    def movement_cost(self, movement_cost):
+    def set_movement_cost(self, movement_cost):
         self._movement_cost = movement_cost

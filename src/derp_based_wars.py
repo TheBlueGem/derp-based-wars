@@ -91,13 +91,13 @@ def handle_keydown_event(event_key, selector: Selector, board: Board):
             unit = start_tile.pop_unit()
             destination_tile = board.get_tile(route_destination[0], route_destination[1])
             destination_tile.objects.append(unit)
-            selector.toggle_select(None)
+            selector.toggle_select(None, board)
 
         else:
             tile = board.get_tile(selector.location[0], selector.location[1])
-            unit = tile.get_unit()
-            if unit is not None:
-                selector.toggle_select(unit)
+            units = tile.get_units()
+            if len(units) > 0:
+                selector.toggle_select(units[0], board)
 
 
 if __name__ == '__main__':
