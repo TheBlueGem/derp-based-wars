@@ -77,7 +77,7 @@ class Selector(ABC):
         print(self)
 
     def __str__(self):
-        return "Selector with selected tile: %d, %d" % self._location
+        return "Selector - selected tile: %d, %d" % self._location
 
     @property
     def location(self) -> Tuple[int, int]:
@@ -129,7 +129,16 @@ class Selector(ABC):
             self._selected_movement = 0
             print("Deselected")
 
-    def get_surroundings(self, new_location: Tuple[int, int]):
+    def get_oldest_step_in_route_from_surroundings(self, surroundings: list) -> Optional[Tuple[int, int]]:
+        current_lowest = 100
+        lowest: Optional[Tuple[int, int]] = None
+        for el in surroundings:
+            if el in self._selected_route and self._selected_route.index(el) < current_lowest:
+                current_lowest = self._selected_route.index(el)
+                lowest = el
+        return lowest
+
+    def route_trimmable_to(self, new_location: Tuple[int, int]) -> Optional[Tuple[int, int]]:
         surroundings = list()
         previous_selection = self._selected_route[len(self._selected_route) - 1]
 
@@ -149,17 +158,9 @@ class Selector(ABC):
         if current != previous_selection and tuple_in_list(current, self._selected_route):
             surroundings.append(current)
 
-        print("Surroundings: " + str(surroundings))
-        return surroundings
+        result_location = self.get_oldest_step_in_route_from_surroundings(surroundings)
 
-    def get_lowest_index_prev_location(self, surroundings: list) -> Optional[Tuple[int, int]]:
-        current_lowest = 100
-        lowest: Optional[Tuple[int, int]] = None
-        for el in surroundings:
-            if el in self._selected_route and self._selected_route.index(el) < current_lowest:
-                current_lowest = self._selected_route.index(el)
-                lowest = el
-        return lowest
+        return result_location
 
     def update_selected_route(self, new_location: Tuple[int, int]) -> None:
         if new_location == self._selected_route[0]:
@@ -168,14 +169,13 @@ class Selector(ABC):
             self._location = new_location
             return
 
-        surroundings = self.get_surroundings(new_location)
-        prev_location = self.get_lowest_index_prev_location(surroundings)
-        if prev_location is not None:
+        trimmable_to = self.route_trimmable_to(new_location)
+        if trimmable_to is not None:
             print("Trimming on prev selection")
             trimmed_selection = []
             for tile in self._selected_route:
                 trimmed_selection.append(tile)
-                if tile == prev_location:
+                if tile == trimmable_to:
                     trimmed_selection.append(new_location)
                     self._selected_route = trimmed_selection
                     self._location = new_location
