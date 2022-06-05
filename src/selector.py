@@ -10,6 +10,8 @@ from common import TILE_SIZE
 from common import BLUE
 from typing import Tuple
 
+from tile import LocationTile
+from tile import MovementTile
 from tile import Tile
 from tile_objects.environment.environment import Environment
 from tile_objects.units.unit import Unit
@@ -32,12 +34,29 @@ def calc_selection_direction(src_tile: Tuple[int, int], dest_tile: Tuple[int, in
         return LEFT
 
 
-def get_surroundings(location: Tuple[int, int], board: Board) -> [Tuple[int, int]]:
+def get_surroundings(location: Tuple[int, int], board: Board) -> [LocationTile]:
     surroundings = list()
-    surroundings.append(board.get_tile(location[0], location[1] - 1))
-    surroundings.append(board.get_tile(location[0] + 1, location[1]))
-    surroundings.append(board.get_tile(location[0], location[1] + 1))
-    surroundings.append(board.get_tile(location[0] - 1, location[1]))
+    surroundings.append(
+        LocationTile(
+            location=Tuple[location[0], location[1] - 1],
+            tile=board.get_tile(location[0], location[1] - 1))
+    )
+
+    surroundings.append(
+        LocationTile(
+            location=Tuple[location[0] + 1, location[1]],
+            tile=board.get_tile(location[0] + 1, location[1]))
+        )
+    surroundings.append(
+        LocationTile(
+            location=Tuple[location[0], location[1] + 1],
+            tile=board.get_tile(location[0], location[1] + 1))
+        )
+    surroundings.append(
+        LocationTile(
+            location=Tuple[location[0] - 1, location[1]],
+            tile=board.get_tile(location[0] - 1, location[1]))
+        )
 
     return surroundings
 
@@ -200,30 +219,20 @@ class Selector(ABC):
     def get_selected_destination(self) -> Tuple[int, int]:
         return self._selected_route[len(self._selected_route) - 1]
 
-    # def handle_x_selection(self, movement: int, y_delta: int, selected_movement: list):
-    #     next_location = (self._location[0], self._location[1] + y_delta)
-    #     selected_movement.append(next_location)
-    #     for j in range(0, movement - abs(y_delta)):
-    #         x_steps = j + 1
-    #         x_location = (next_location[0] - x_steps, next_location[1])
-    #         selected_movement.append(x_location)
-    #         x_location = (next_location[0] + x_steps, next_location[1])
-    #         selected_movement.append(x_location)
-
     def get_unit_movement_grid(self, unit: Unit, board: Board):
-        movement = unit.movement
-        selected_movement = list()
-        for i in range(0, movement):
-            surroundings: list = get_surroundings(self._location + movement, board)
 
-            for tile in surroundings:
-                if tile is not None:
-                    envs = tile.get_envs()
-                    if len(envs) > 0:
-                        # TODO Netjes vakjes afgaan om paden te bepalen. Mind you dat het kortste pad altijd de waarheid is
-                        selected_movement.append(envs[0].movement_cost())
-            # self.handle_x_selection(movement, -i, selected_movement)
-            # self.handle_x_selection(movement, i + 1, selected_movement)
+        parent_tile = {}
+        parent_tile.movement_tile = MovementTile(self._location, None)
+        parent_tile.children = get_surroundings(parent_tile.movement_tile.location, board)
+
+        for movement_tile in parent_tile.children:
+            if movement_tile.tile is not None:
+                envs = movement_tile.tile.get_envs()
+                if len(envs) > 0 and parent_tile.movement_tile.movement_cost + envs[0].movement_cost() <= unit.movement:
+                    # TODO Netjes vakjes afgaan om paden te bepalen. Mind you dat het kortste pad altijd de waarheid is
+                    #  Vanaf huidige positie unit boom opbouwen waarin telkens wordt gekeken of de unit genoeg movement
+                    #  heeft om naar de kinderen van de huidige tile te bewegen
+                    return "blaat"
 
         return selected_movement
 

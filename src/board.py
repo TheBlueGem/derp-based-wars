@@ -1,5 +1,5 @@
 import logging
-from typing import Optional
+from typing import List, Optional
 
 from pygame import draw as pygame_draw
 from pygame import Surface
@@ -45,7 +45,7 @@ class Board(BaseObject):
         return self._background_color
 
     @property
-    def tiles(self) -> [[Tile]]:
+    def tiles(self) -> List[List[Tile]]:
         return self._tiles
 
     # Set a tile on the board

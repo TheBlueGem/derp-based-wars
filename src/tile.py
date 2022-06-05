@@ -1,5 +1,6 @@
 import logging
 from typing import Optional
+from typing import Tuple
 
 from pygame import Surface
 from pygame import draw as pygame_draw
@@ -76,3 +77,25 @@ class Tile(BaseObject):
             if isinstance(obj, Environment):
                 result.append(obj)
         return result
+
+
+class MovementTile:
+    _movement_cost = 0
+    _location = None
+    _tile = None
+
+    def __init__(self, location: Tuple[int, int], tile: Tile):
+        self._location = location
+        self._tile = tile
+
+    @property
+    def movement_cost(self) -> int:
+        return self._movement_cost
+
+    @property
+    def location(self) -> Tuple[int, int]:
+        return self._location
+
+    @property
+    def tile(self) -> Tile:
+        return self._tile

@@ -7,3 +7,4 @@
 * Move units []
     - When selecting a unit it should be able to be moved
     - The available movement of a unit is based on its movement stat and the surrounding terrain
+    - Terrain should hold a movement property which shows how much movement it costs to traverse it
