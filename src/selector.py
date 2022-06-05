@@ -121,7 +121,6 @@ class Selector(ABC):
             self._selected_route.append(self._location)
             self._selected_movement_grid = self.get_unit_movement_grid(unit)
             self._selected_movement = unit.movement
-            print(self._selected_movement_grid)
             print("Selected")
         else:
             self._selected_route = []

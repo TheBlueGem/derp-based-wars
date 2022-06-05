@@ -55,6 +55,14 @@ class Tile(BaseObject):
         self._surface = surface
 
     @property
+    def environment(self) -> Environment:
+        return self._environment
+
+    @environment.setter
+    def environment(self, environment: Environment):
+        self._environment = environment
+
+    @property
     def units(self) -> list:
         return self._units
 

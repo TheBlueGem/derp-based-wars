@@ -55,7 +55,7 @@ class Board(BaseObject):
 
     # Get a tile from the board
     def get_tile(self, x: int, y: int) -> Optional[Tile]:
-        if isinstance(self._tiles[x][y], Tile):
+        if len(self._tiles) > x and len(self._tiles[x]) > y:
             return self._tiles[x][y]
         return None
 

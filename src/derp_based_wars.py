@@ -1,5 +1,6 @@
 import logging
 import sys
+from typing import Dict
 
 from pygame import display
 from pygame import event as pygame_event
@@ -18,7 +19,7 @@ from common import BACKGROUND_COLOR
 from common import TILE_SIZE
 from common import WINDOW_HEIGHT
 from common import WINDOW_WIDTH
-# from movement_grid import get_movement_grid
+from movement_grid import calculate_grid
 from options import FPS
 from options import SELECTOR_DOWN
 from options import SELECTOR_LEFT
@@ -35,7 +36,8 @@ from tile_objects.units.spear import spear
 board_width = 10
 board_height = 10
 
-logging.getLogger()
+logger = logging.getLogger("Main")
+logger.setLevel(10)
 
 
 # Main game loop
@@ -65,7 +67,6 @@ def main():
     main_board.draw()
     selector = Selector((4, 4))
 
-    # print(display_surf.get_flags())
     while True:
         for event in pygame_event.get():
             if event.type == QUIT or (event.type == KEYUP and event.key == K_ESCAPE):
@@ -108,6 +109,20 @@ def handle_keydown_event(event_key, selector: Selector, board: Board):
             unit = board.get_tile(selector.location[0], selector.location[1]).get_unit()
             if unit is not None:
                 selector.toggle_select(unit)
+                grid = calculate_grid(selector.location, unit.movement, board)
+                # for entry in grid:
+                #     print(str(entry))
+                #     for deep_entry in entry:
+                #         print(deep_entry)
+                for key in grid.keys():
+                    item = grid[key]
+                    if isinstance(item, Dict):
+                        for deep_key in item.keys():
+                            deep_item = item[deep_key]
+                            if isinstance(deep_item, int):
+                                print(str(key) + ", " + str(deep_key) + ": " + str(deep_item))
+
+                # print("Grid result: " + str(grid))
                 # get_movement_grid((selector.location[0], selector.location[1]), unit,
                 #                   board)
 

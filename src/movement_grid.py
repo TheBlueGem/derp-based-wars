@@ -1,6 +1,6 @@
-from typing import Optional
-from typing import Tuple
+from typing import Dict
 from typing import List
+from typing import Tuple
 
 from board import Board
 from tile import Tile
@@ -11,11 +11,13 @@ class RouteEntry:
     _x = None
     _y = None
     _tile = None
+    _movement_left = None
 
-    def __init__(self, x, y, tile):
+    def __init__(self, x, y, tile, movement_left):
         self._x = x
         self._y = y
         self._tile = tile
+        self._movement_left = movement_left
 
     @property
     def x(self):
@@ -41,46 +43,68 @@ class RouteEntry:
     def tile(self, tile: Tile):
         self._tile = tile
 
+    @property
+    def movement_left(self):
+        return self._movement_left
 
-class MovementGrid:
-    def get_grid(self, source_location: Tuple[int, int], unit: Unit, board: Board):
-        movement = unit.movement
-        routes = self.calculate_routes(source_location, movement, board)
 
-    def calculate_routes(self, source_location: Tuple[int, int], movement: int, board: Board):
-        routes = [[]]
-        surroundings = self.get_surroundings(source_location, board)
-        for entry in surroundings:
-            if not routes[entry.x][entry.y] and entry.tile:
+def get_grid(source_location: Tuple[int, int], unit: Unit, board: Board):
+    movement = unit.movement
+    return calculate_grid(source_location, movement, board)
 
-                routes.append()
-        pass
 
-    def get_surroundings(self, source_location: Tuple[int, int], board: Board) -> List[RouteEntry]:
+def calculate_grid(source_location: Tuple[int, int], movement: int, board: Board) -> Dict:
+    grid = {}
+    surroundings = get_surroundings(location=source_location, movement_left=movement, board=board)
+    for entry in surroundings:
+        movement_left = entry.movement_left - entry.tile.environment.movement_cost
+        if movement_left >= 0:
+            entry_surroundings = get_surroundings(location=(entry.x, entry.y), movement_left=movement_left, board=board)
+            for entry_surrounding in entry_surroundings:
+                if entry_surrounding.tile.environment:
+                    surroundings.append(entry_surrounding)
+            if not grid.get(entry.x):
+                grid[entry.x] = {
+                    entry.y: movement_left
+                }
+                current = grid.get(entry.x)
+                if not current.get(entry.y):
+                    current[entry.y] = movement_left
+    return grid
 
-        return [
-            RouteEntry(x=source_location[0] + 1,
-                       y=source_location[1],
-                       tile=board.get_tile(source_location[0] + 1, source_location[1])),
-            RouteEntry(x=source_location[0] - 1,
-                       y=source_location[1],
-                       tile=board.get_tile(source_location[0] - 1, source_location[1])),
-            RouteEntry(x=source_location[0],
-                       y=source_location[1] + 1,
-                       tile=board.get_tile(source_location[0], source_location[1] + 1)),
-            RouteEntry(x=source_location[0],
-                       y=source_location[1] - 1,
-                       tile=board.get_tile(source_location[0], source_location[1] - 1))
-        ]
 
-        # if up_neighbour != previous_location:
-        #     surroundings.append(up_neighbour)
-        # if down_neighbour != previous_location:
-        #     surroundings.append(down_neighbour)
-        # if left_neighbour != previous_location:
-        #     surroundings.append(left_neighbour)
-        # if right_neighbour != previous_location:
-        #     surroundings.append(right_neighbour)
-        #
-        # print("Surroundings: " + str(surroundings))
-        # return surroundings
+def get_surroundings(location: Tuple[int, int], movement_left: int, board: Board) -> List[RouteEntry]:
+    entries = []
+    if board.get_tile(location[0] + 1, location[1]):
+        entries.append(RouteEntry(x=location[0] + 1,
+                                  y=location[1],
+                                  tile=board.get_tile(location[0] + 1, location[1]),
+                                  movement_left=movement_left))
+    if board.get_tile(location[0] - 1, location[1]):
+        entries.append(RouteEntry(x=location[0] - 1,
+                                  y=location[1],
+                                  tile=board.get_tile(location[0] - 1, location[1]),
+                                  movement_left=movement_left))
+    if board.get_tile(location[0], location[1] + 1):
+        entries.append(RouteEntry(x=location[0],
+                                  y=location[1] + 1,
+                                  tile=board.get_tile(location[0], location[1] + 1),
+                                  movement_left=movement_left))
+    if board.get_tile(location[0], location[1] - 1):
+        entries.append(RouteEntry(x=location[0],
+                                  y=location[1] - 1,
+                                  tile=board.get_tile(location[0], location[1] - 1),
+                                  movement_left=movement_left))
+    return entries
+
+    # if up_neighbour != previous_location:
+    #     surroundings.append(up_neighbour)
+    # if down_neighbour != previous_location:
+    #     surroundings.append(down_neighbour)
+    # if left_neighbour != previous_location:
+    #     surroundings.append(left_neighbour)
+    # if right_neighbour != previous_location:
+    #     surroundings.append(right_neighbour)
+    #
+    # print("Surroundings: " + str(surroundings))
+    # return surroundings
