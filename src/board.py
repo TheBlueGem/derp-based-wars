@@ -27,7 +27,7 @@ class Board(BaseObject):
         surface.fill(self._background_color)
         self._surface = surface
         self._tiles = [
-            [Tile(objects=[], surface=surface.subsurface(Rect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE))) for
+            [Tile(units=[], environment=None, surface=surface.subsurface(Rect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE))) for
              y in range(width)] for x in range(height)]
         self._width = width
         self._height = height

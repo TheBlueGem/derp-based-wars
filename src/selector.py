@@ -131,6 +131,7 @@ class Selector(ABC):
 
 
     def update_selected_route(self, new_location: Tuple[int, int]) -> None:
+        pass
 
     def get_selected_destination(self) -> Tuple[int, int]:
         return self._selected_route[len(self._selected_route) - 1]

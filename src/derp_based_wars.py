@@ -1,21 +1,30 @@
 import logging
 import sys
 
-from pygame import quit as pygame_quit
 from pygame import display
-from pygame import init
-from pygame.locals import QUIT, KEYUP, K_ESCAPE, KEYDOWN
-from pygame import time
 from pygame import event as pygame_event
+from pygame import init
+from pygame import quit as pygame_quit
+from pygame import time
+from pygame.locals import KEYDOWN
+from pygame.locals import KEYUP
+from pygame.locals import K_ESCAPE
+from pygame.locals import QUIT
 from pygame.rect import Rect
 from pygame.surface import Surface
 
 from board import Board
+from common import BACKGROUND_COLOR
 from common import TILE_SIZE
-from movement_grid import get_movement_grid
-from options import FPS, SELECTOR_DOWN, SELECTOR_LEFT, SELECTOR_RIGHT, SELECTOR_UP
-from common import WINDOW_WIDTH, WINDOW_HEIGHT, BACKGROUND_COLOR
+from common import WINDOW_HEIGHT
+from common import WINDOW_WIDTH
+# from movement_grid import get_movement_grid
+from options import FPS
+from options import SELECTOR_DOWN
+from options import SELECTOR_LEFT
+from options import SELECTOR_RIGHT
 from options import SELECTOR_SELECT
+from options import SELECTOR_UP
 from selector import Selector
 from tile import Tile
 from tile_objects.environment.forest import forest
@@ -43,14 +52,14 @@ def main():
     for x in range(main_board.width):
         for y in range(main_board.height - 1):
             if y % 2 and x % 2:
-                main_board.set_tile(x, y, Tile(objects=[forest()], surface=None))
+                main_board.set_tile(x, y, Tile(units=[], environment=forest(), surface=None))
             elif y % 3 and x % 3:
-                main_board.set_tile(x, y, Tile(objects=[mountain()], surface=None))
+                main_board.set_tile(x, y, Tile(units=[], environment=mountain(), surface=None))
             else:
-                main_board.set_tile(x, y, Tile(objects=[grass()], surface=None))
+                main_board.set_tile(x, y, Tile(units=[], environment=grass(), surface=None))
 
     tile = main_board.get_tile(3, 3)
-    tile.objects.append(spear())
+    tile.units.append(spear())
     main_board.set_tile(3, 3, tile)
 
     main_board.draw()
@@ -92,14 +101,15 @@ def handle_keydown_event(event_key, selector: Selector, board: Board):
             start_tile = board.get_tile(route_start[0], route_start[1])
             unit = start_tile.pop_unit()
             destination_tile = board.get_tile(route_destination[0], route_destination[1])
-            destination_tile.objects.append(unit)
+            destination_tile.units.append(unit)
             selector.toggle_select(None)
 
         else:
             unit = board.get_tile(selector.location[0], selector.location[1]).get_unit()
             if unit is not None:
-                selector.toggle_select(unit, get_movement_grid((selector.location[0], selector.location[1]), unit,
-                                                              board))
+                selector.toggle_select(unit)
+                # get_movement_grid((selector.location[0], selector.location[1]), unit,
+                #                   board)
 
 
 if __name__ == '__main__':
