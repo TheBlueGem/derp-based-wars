@@ -1,14 +1,14 @@
 from abc import ABC
+from typing import Dict
 from typing import Optional
+from typing import Tuple
 
 import pygame
 from pygame.surface import Surface
 
+from common import BLUE
 from common import LIGHTISH_BLUE
 from common import TILE_SIZE
-from common import BLUE
-from typing import Tuple
-
 from tile_objects.units.unit import Unit
 from utils import tuple_in_list
 
@@ -60,7 +60,7 @@ def draw_selection_arrow(surface: Surface, tile: Tuple[int, int], selection_dire
 class Selector(ABC):
     _location = Tuple[int, int]
     _selected_route = list()
-    _selected_movement_grid = list()
+    _selected_movement_grid = dict()
     _selected_movement = 0
     _line_thiccness = 3
 
@@ -100,7 +100,7 @@ class Selector(ABC):
         self._selected_movement = selected_movement
 
     @property
-    def selected_movement_grid(self) -> list:
+    def selected_movement_grid(self) -> dict:
         return self._selected_movement_grid
 
     @selected_movement_grid.setter
@@ -124,10 +124,9 @@ class Selector(ABC):
             print("Selected")
         else:
             self._selected_route = []
-            self._selected_movement_grid = []
+            self._selected_movement_grid = {}
             self._selected_movement = 0
             print("Deselected")
-
 
     def update_selected_route(self, new_location: Tuple[int, int]) -> None:
         pass
@@ -155,7 +154,7 @@ class Selector(ABC):
 
         return selected_movement
 
-    def draw_selection(self, surface: Surface) -> None:
+    def draw_selected_route(self, surface: Surface) -> None:
         if len(self._selected_route) > 1:
             iterator = iter(self._selected_route)
             selection_direction = None
@@ -190,11 +189,14 @@ class Selector(ABC):
             draw_selection_arrow(surface, src_tile, selection_direction)
 
     def draw_selected_movement(self, surface: Surface):
-        for tup in self._selected_movement_grid:
-            selection_surf: Surface = Surface((TILE_SIZE, TILE_SIZE))
-            selection_surf.fill(LIGHTISH_BLUE)
-            selection_surf.set_alpha(100)
-            surface.blit(selection_surf, (tup[0] * TILE_SIZE, tup[1] * TILE_SIZE))
+        selection_surf: Surface = Surface((TILE_SIZE, TILE_SIZE))
+        selection_surf.fill(LIGHTISH_BLUE)
+        selection_surf.set_alpha(100)
+        for x in self._selected_movement_grid.keys():
+            column = self._selected_movement_grid[x]
+            if isinstance(column, Dict):
+                for y in column.keys():
+                    surface.blit(selection_surf, (x * TILE_SIZE, y * TILE_SIZE))
 
     def draw(self, surface: Surface) -> None:
         if self._location is not None:
@@ -217,5 +219,7 @@ class Selector(ABC):
             pygame.draw.line(surface, BLUE, (x + TILE_SIZE, y + TILE_SIZE),
                              (x + TILE_SIZE, y + TILE_SIZE - line_length), self._line_thiccness)
 
-            self.draw_selected_movement(surface)
-            self.draw_selection(surface)
+            # TODO: This will be a bug for units that have a situation in which they have 0 movement.
+            if self._selected_movement > 0:
+                self.draw_selected_movement(surface)
+                self.draw_selected_route(surface)

@@ -55,7 +55,7 @@ def main():
         for y in range(main_board.height - 1):
             if y % 2 and x % 2:
                 main_board.set_tile(x, y, Tile(units=[], environment=forest(), surface=None))
-            elif y % 3 and x % 3:
+            elif y % 3 and x % 3 and (x is not 2 and y is not 2):
                 main_board.set_tile(x, y, Tile(units=[], environment=mountain(), surface=None))
             else:
                 main_board.set_tile(x, y, Tile(units=[], environment=grass(), surface=None))
@@ -109,22 +109,7 @@ def handle_keydown_event(event_key, selector: Selector, board: Board):
             unit = board.get_tile(selector.location[0], selector.location[1]).get_unit()
             if unit is not None:
                 selector.toggle_select(unit)
-                grid = calculate_grid(selector.location, unit.movement, board)
-                # for entry in grid:
-                #     print(str(entry))
-                #     for deep_entry in entry:
-                #         print(deep_entry)
-                for key in grid.keys():
-                    item = grid[key]
-                    if isinstance(item, Dict):
-                        for deep_key in item.keys():
-                            deep_item = item[deep_key]
-                            if isinstance(deep_item, int):
-                                print(str(key) + ", " + str(deep_key) + ": " + str(deep_item))
-
-                # print("Grid result: " + str(grid))
-                # get_movement_grid((selector.location[0], selector.location[1]), unit,
-                #                   board)
+                selector.selected_movement_grid = calculate_grid(selector.location, unit.movement, board)
 
 
 if __name__ == '__main__':

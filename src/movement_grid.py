@@ -1,5 +1,6 @@
 from typing import Dict
 from typing import List
+from typing import Optional
 from typing import Tuple
 
 from board import Board
@@ -54,11 +55,15 @@ def get_grid(source_location: Tuple[int, int], unit: Unit, board: Board):
 
 
 def calculate_grid(source_location: Tuple[int, int], movement: int, board: Board) -> Dict:
-    grid = {}
+    grid = {
+        source_location[0]: {
+            source_location[1]: movement
+        }
+    }
     surroundings = get_surroundings(location=source_location, movement_left=movement, board=board)
     for entry in surroundings:
         movement_left = entry.movement_left - entry.tile.environment.movement_cost
-        if movement_left >= 0:
+        if movement_left >= 0 and not in_grid(entry, grid):
             entry_surroundings = get_surroundings(location=(entry.x, entry.y), movement_left=movement_left, board=board)
             for entry_surrounding in entry_surroundings:
                 if entry_surrounding.tile.environment:
@@ -67,10 +72,17 @@ def calculate_grid(source_location: Tuple[int, int], movement: int, board: Board
                 grid[entry.x] = {
                     entry.y: movement_left
                 }
-                current = grid.get(entry.x)
-                if not current.get(entry.y):
-                    current[entry.y] = movement_left
+            current_column = grid.get(entry.x)
+            if not current_column.get(entry.y):
+                current_column[entry.y] = movement_left
     return grid
+
+
+def in_grid(entry: RouteEntry, grid: Dict):
+    column: Optional[Dict] = grid.get(entry.x)
+    if not column or not column.get(entry.y):
+        return False
+    return True
 
 
 def get_surroundings(location: Tuple[int, int], movement_left: int, board: Board) -> List[RouteEntry]:
