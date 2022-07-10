@@ -5,7 +5,6 @@ from typing import Tuple
 
 from board import Board
 from tile import Tile
-from tile_objects.units.unit import Unit
 
 
 class RouteEntry:
@@ -49,11 +48,6 @@ class RouteEntry:
         return self._movement_left
 
 
-def get_grid(source_location: Tuple[int, int], unit: Unit, board: Board):
-    movement = unit.movement
-    return calculate_grid(source_location, movement, board)
-
-
 def calculate_grid(source_location: Tuple[int, int], movement: int, board: Board) -> Dict:
     grid = {
         source_location[0]: {
@@ -63,7 +57,7 @@ def calculate_grid(source_location: Tuple[int, int], movement: int, board: Board
     surroundings = get_surroundings(location=source_location, movement_left=movement, board=board)
     for entry in surroundings:
         movement_left = entry.movement_left - entry.tile.environment.movement_cost
-        if movement_left >= 0 and not in_grid(entry, grid):
+        if movement_left >= 0 and not route_entry_in_grid(entry, grid):
             entry_surroundings = get_surroundings(location=(entry.x, entry.y), movement_left=movement_left, board=board)
             for entry_surrounding in entry_surroundings:
                 if entry_surrounding.tile.environment:
@@ -78,9 +72,16 @@ def calculate_grid(source_location: Tuple[int, int], movement: int, board: Board
     return grid
 
 
-def in_grid(entry: RouteEntry, grid: Dict):
+def route_entry_in_grid(entry: RouteEntry, grid: Dict):
     column: Optional[Dict] = grid.get(entry.x)
     if not column or not column.get(entry.y):
+        return False
+    return True
+
+
+def tuple_in_grid(_tuple: Tuple[int, int], grid: Dict):
+    column: Optional[Dict] = grid.get(_tuple[0])
+    if not column or not column.get(_tuple[1]):
         return False
     return True
 
@@ -108,15 +109,3 @@ def get_surroundings(location: Tuple[int, int], movement_left: int, board: Board
                                   tile=board.get_tile(location[0], location[1] - 1),
                                   movement_left=movement_left))
     return entries
-
-    # if up_neighbour != previous_location:
-    #     surroundings.append(up_neighbour)
-    # if down_neighbour != previous_location:
-    #     surroundings.append(down_neighbour)
-    # if left_neighbour != previous_location:
-    #     surroundings.append(left_neighbour)
-    # if right_neighbour != previous_location:
-    #     surroundings.append(right_neighbour)
-    #
-    # print("Surroundings: " + str(surroundings))
-    # return surroundings

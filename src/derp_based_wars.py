@@ -1,6 +1,5 @@
 import logging
 import sys
-from typing import Dict
 
 from pygame import display
 from pygame import event as pygame_event
@@ -53,7 +52,9 @@ def main():
 
     for x in range(main_board.width):
         for y in range(main_board.height - 1):
-            if y % 2 and x % 2:
+            if y == 3 and x == 2:
+                main_board.set_tile(x, y, Tile(units=[], environment=mountain(), surface=None))
+            elif y % 2 and x % 2:
                 main_board.set_tile(x, y, Tile(units=[], environment=forest(), surface=None))
             elif y % 3 and x % 3 and (x is not 2 and y is not 2):
                 main_board.set_tile(x, y, Tile(units=[], environment=mountain(), surface=None))
@@ -103,13 +104,12 @@ def handle_keydown_event(event_key, selector: Selector, board: Board):
             unit = start_tile.pop_unit()
             destination_tile = board.get_tile(route_destination[0], route_destination[1])
             destination_tile.units.append(unit)
-            selector.toggle_select(None)
+            selector.toggle_select(board, None)
 
         else:
             unit = board.get_tile(selector.location[0], selector.location[1]).get_unit()
             if unit is not None:
-                selector.toggle_select(unit)
-                selector.selected_movement_grid = calculate_grid(selector.location, unit.movement, board)
+                selector.toggle_select(board, unit)
 
 
 if __name__ == '__main__':

@@ -6,11 +6,13 @@ from typing import Tuple
 import pygame
 from pygame.surface import Surface
 
+from board import Board
 from common import BLUE
 from common import LIGHTISH_BLUE
 from common import TILE_SIZE
+from movement_grid import calculate_grid
+from movement_grid import tuple_in_grid
 from tile_objects.units.unit import Unit
-from utils import tuple_in_list
 
 UP = 0
 RIGHT = 1
@@ -111,15 +113,15 @@ class Selector(ABC):
         new_location = (self.location[0] + x, self.location[1] + y)
         if self._selected_movement == 0:
             self._location = new_location
-        elif tuple_in_list(new_location, self._selected_movement_grid):
+        elif tuple_in_grid(new_location, self._selected_movement_grid):
             self.update_selected_route(new_location)
 
         print(str(self))
 
-    def toggle_select(self, unit: Optional[Unit]) -> None:
+    def toggle_select(self, board: Board, unit: Optional[Unit]) -> None:
         if len(self._selected_route) is 0 and unit is not None:
             self._selected_route.append(self._location)
-            self._selected_movement_grid = self.get_unit_movement_grid(unit)
+            self.selected_movement_grid = calculate_grid(self.location, unit.movement, board)
             self._selected_movement = unit.movement
             print("Selected")
         else:
@@ -128,8 +130,25 @@ class Selector(ABC):
             self._selected_movement = 0
             print("Deselected")
 
-    def update_selected_route(self, new_location: Tuple[int, int]) -> None:
+    def should_trim_selected_route(self, new_location: Tuple[int, int]) -> bool:
+        if tuple_in_grid((new_location[0] - 1, new_location[1]), self._selected_movement_grid) or tuple_in_grid(
+                (new_location[0] + 1, new_location[1]), self._selected_movement_grid) or tuple_in_grid(
+                (new_location[0], new_location[1] - 1), self._selected_movement_grid) or tuple_in_grid(
+                (new_location[0], new_location[1] + 1), self._selected_movement_grid):
+            return True
+        return False
+
+    def trim_selected_route(self):
         pass
+
+    def update_selected_route(self, new_location: Tuple[int, int]) -> None:
+        if new_location == self._selected_route[0]:
+            print("Reset selection")
+            self._selected_route = [new_location]
+            self._location = new_location
+            return
+        if self.should_trim_selected_route(new_location):
+            self.trim_selected_route()
 
     def get_selected_destination(self) -> Tuple[int, int]:
         return self._selected_route[len(self._selected_route) - 1]
@@ -143,16 +162,6 @@ class Selector(ABC):
             selected_movement.append(x_location)
             x_location = (next_location[0] + x_steps, next_location[1])
             selected_movement.append(x_location)
-
-    def get_unit_movement_grid(self, unit: Unit):
-        movement = unit.movement
-        selected_movement = list()
-        for i in range(0, (movement + 1)):
-            self.handle_x_selection(movement, -i, selected_movement)
-            if i + 1 < movement + 1:
-                self.handle_x_selection(movement, i + 1, selected_movement)
-
-        return selected_movement
 
     def draw_selected_route(self, surface: Surface) -> None:
         if len(self._selected_route) > 1:
