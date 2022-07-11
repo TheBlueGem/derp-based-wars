@@ -13,6 +13,7 @@ from common import TILE_SIZE
 from movement_grid import calculate_grid
 from movement_grid import tuple_in_grid
 from tile_objects.units.unit import Unit
+from utils import tuple_in_list
 
 UP = 0
 RIGHT = 1
@@ -62,7 +63,7 @@ def draw_selection_arrow(surface: Surface, tile: Tuple[int, int], selection_dire
 class Selector(ABC):
     _location = Tuple[int, int]
     _selected_route = list()
-    _selected_movement_grid = dict()
+    _selected_movement_grid: Dict = dict()
     _selected_movement = 0
     _line_thiccness = 3
 
@@ -130,38 +131,45 @@ class Selector(ABC):
             self._selected_movement = 0
             print("Deselected")
 
-    def should_trim_selected_route(self, new_location: Tuple[int, int]) -> bool:
-        if tuple_in_grid((new_location[0] - 1, new_location[1]), self._selected_movement_grid) or tuple_in_grid(
-                (new_location[0] + 1, new_location[1]), self._selected_movement_grid) or tuple_in_grid(
-                (new_location[0], new_location[1] - 1), self._selected_movement_grid) or tuple_in_grid(
-                (new_location[0], new_location[1] + 1), self._selected_movement_grid):
-            return True
-        return False
+    def is_last_in_selected_route(self, location: Tuple[int, int]):
+        return location == self._selected_route[len(self._selected_route) - 1]
 
-    def trim_selected_route(self):
-        pass
+    def get_trim_location(self, new_location: Tuple[int, int]) -> Optional[Tuple[int, int]]:
+        west = (new_location[0] - 1, new_location[1])
+        east = (new_location[0] + 1, new_location[1])
+        north = (new_location[0], new_location[1] - 1)
+        south = (new_location[0], new_location[1] + 1)
+        if tuple_in_list(new_location, self._selected_route):
+            return new_location
+        elif tuple_in_list(west, self._selected_route) and not self.is_last_in_selected_route(west):
+            return west
+        elif tuple_in_list(east, self._selected_route) and not self.is_last_in_selected_route(east):
+            return east
+        elif tuple_in_list(north, self._selected_route) and not self.is_last_in_selected_route(north):
+            return north
+        elif tuple_in_list(south, self._selected_route) and not self.is_last_in_selected_route(south):
+            return south
+        return None
+
+    def trim_selected_route(self, new_location: Tuple[int, int]):
+        print("Trimming selected route")
+        iterator = iter(self._selected_route)
+        end_of_trim = next(iterator)
+        trimmed_route = [end_of_trim]
+        while end_of_trim != new_location:
+            end_of_trim = next(iterator)
+            trimmed_route.append(end_of_trim)
+        return trimmed_route
 
     def update_selected_route(self, new_location: Tuple[int, int]) -> None:
-        if new_location == self._selected_route[0]:
-            print("Reset selection")
-            self._selected_route = [new_location]
-            self._location = new_location
-            return
-        if self.should_trim_selected_route(new_location):
-            self.trim_selected_route()
+        trim_location = self.get_trim_location(new_location)
+        if trim_location:
+            self._selected_route = self.trim_selected_route(trim_location)
+        self._selected_route.append(new_location)
+        self._location = new_location
 
     def get_selected_destination(self) -> Tuple[int, int]:
         return self._selected_route[len(self._selected_route) - 1]
-
-    def handle_x_selection(self, movement: int, y_delta: int, selected_movement: list):
-        next_location = (self._location[0], self._location[1] + y_delta)
-        selected_movement.append(next_location)
-        for j in range(0, movement - abs(y_delta)):
-            x_steps = j + 1
-            x_location = (next_location[0] - x_steps, next_location[1])
-            selected_movement.append(x_location)
-            x_location = (next_location[0] + x_steps, next_location[1])
-            selected_movement.append(x_location)
 
     def draw_selected_route(self, surface: Surface) -> None:
         if len(self._selected_route) > 1:

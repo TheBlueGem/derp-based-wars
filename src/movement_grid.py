@@ -81,9 +81,9 @@ def route_entry_in_grid(entry: RouteEntry, grid: Dict):
 
 def tuple_in_grid(_tuple: Tuple[int, int], grid: Dict):
     column: Optional[Dict] = grid.get(_tuple[0])
-    if not column or not column.get(_tuple[1]):
-        return False
-    return True
+    if column and column.get(_tuple[1]) is not None:
+        return True
+    return False
 
 
 def get_surroundings(location: Tuple[int, int], movement_left: int, board: Board) -> List[RouteEntry]:

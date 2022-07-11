@@ -105,7 +105,6 @@ def handle_keydown_event(event_key, selector: Selector, board: Board):
             destination_tile = board.get_tile(route_destination[0], route_destination[1])
             destination_tile.units.append(unit)
             selector.toggle_select(board, None)
-
         else:
             unit = board.get_tile(selector.location[0], selector.location[1]).get_unit()
             if unit is not None:
