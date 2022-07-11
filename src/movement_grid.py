@@ -60,8 +60,7 @@ def calculate_grid(source_location: Tuple[int, int], movement: int, board: Board
         if movement_left >= 0 and not route_entry_in_grid(entry, grid):
             entry_surroundings = get_surroundings(location=(entry.x, entry.y), movement_left=movement_left, board=board)
             for entry_surrounding in entry_surroundings:
-                if entry_surrounding.tile.environment:
-                    surroundings.append(entry_surrounding)
+                surroundings.append(entry_surrounding)
             if not grid.get(entry.x):
                 grid[entry.x] = {
                     entry.y: movement_left
@@ -88,24 +87,29 @@ def tuple_in_grid(_tuple: Tuple[int, int], grid: Dict):
 
 def get_surroundings(location: Tuple[int, int], movement_left: int, board: Board) -> List[RouteEntry]:
     entries = []
-    if board.get_tile(location[0] + 1, location[1]):
-        entries.append(RouteEntry(x=location[0] + 1,
-                                  y=location[1],
-                                  tile=board.get_tile(location[0] + 1, location[1]),
-                                  movement_left=movement_left))
-    if board.get_tile(location[0] - 1, location[1]):
+    west = board.get_tile(location[0] - 1, location[1])
+    east = board.get_tile(location[0] + 1, location[1])
+    north = board.get_tile(location[0], location[1] - 1)
+    south = board.get_tile(location[0], location[1] + 1)
+    if west and west.environment:
         entries.append(RouteEntry(x=location[0] - 1,
                                   y=location[1],
-                                  tile=board.get_tile(location[0] - 1, location[1]),
+                                  tile=west,
                                   movement_left=movement_left))
-    if board.get_tile(location[0], location[1] + 1):
-        entries.append(RouteEntry(x=location[0],
-                                  y=location[1] + 1,
-                                  tile=board.get_tile(location[0], location[1] + 1),
+    if east and east.environment:
+        entries.append(RouteEntry(x=location[0] + 1,
+                                  y=location[1],
+                                  tile=east,
                                   movement_left=movement_left))
-    if board.get_tile(location[0], location[1] - 1):
+    if north and north.environment:
         entries.append(RouteEntry(x=location[0],
                                   y=location[1] - 1,
-                                  tile=board.get_tile(location[0], location[1] - 1),
+                                  tile=north,
                                   movement_left=movement_left))
+    if south and south.environment:
+        entries.append(RouteEntry(x=location[0],
+                                  y=location[1] + 1,
+                                  tile=south,
+                                  movement_left=movement_left))
+
     return entries
