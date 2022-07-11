@@ -1,5 +1,6 @@
 from abc import ABC
 from typing import Dict
+from typing import List
 from typing import Optional
 from typing import Tuple
 
@@ -134,37 +135,38 @@ class Selector(ABC):
     def is_last_in_selected_route(self, location: Tuple[int, int]):
         return location == self._selected_route[len(self._selected_route) - 1]
 
-    def get_trim_location(self, new_location: Tuple[int, int]) -> Optional[Tuple[int, int]]:
+    def get_trim_locations(self, new_location: Tuple[int, int]) -> List[Tuple[int, int]]:
+        if tuple_in_list(new_location, self._selected_route):
+            return [new_location]
         west = (new_location[0] - 1, new_location[1])
         east = (new_location[0] + 1, new_location[1])
         north = (new_location[0], new_location[1] - 1)
         south = (new_location[0], new_location[1] + 1)
-        if tuple_in_list(new_location, self._selected_route):
-            return new_location
-        elif tuple_in_list(west, self._selected_route) and not self.is_last_in_selected_route(west):
-            return west
+        trim_locations = []
+        if tuple_in_list(west, self._selected_route) and not self.is_last_in_selected_route(west):
+            trim_locations.append(west)
         elif tuple_in_list(east, self._selected_route) and not self.is_last_in_selected_route(east):
-            return east
-        elif tuple_in_list(north, self._selected_route) and not self.is_last_in_selected_route(north):
-            return north
-        elif tuple_in_list(south, self._selected_route) and not self.is_last_in_selected_route(south):
-            return south
-        return None
+            trim_locations.append(east)
+        if tuple_in_list(north, self._selected_route) and not self.is_last_in_selected_route(north):
+            trim_locations.append(north)
+        if tuple_in_list(south, self._selected_route) and not self.is_last_in_selected_route(south):
+            trim_locations.append(south)
+        return trim_locations
 
-    def trim_selected_route(self, new_location: Tuple[int, int]):
+    def trim_selected_route(self, trim_locations: List[Tuple[int, int]]) -> List[Tuple[int, int]]:
         print("Trimming selected route")
         iterator = iter(self._selected_route)
         end_of_trim = next(iterator)
         trimmed_route = [end_of_trim]
-        while end_of_trim != new_location:
+        while end_of_trim not in trim_locations:
             end_of_trim = next(iterator)
             trimmed_route.append(end_of_trim)
         return trimmed_route
 
     def update_selected_route(self, new_location: Tuple[int, int]) -> None:
-        trim_location = self.get_trim_location(new_location)
-        if trim_location:
-            self._selected_route = self.trim_selected_route(trim_location)
+        trim_locations = self.get_trim_locations(new_location)
+        if len(trim_locations) > 0:
+            self._selected_route = self.trim_selected_route(trim_locations)
         self._selected_route.append(new_location)
         self._location = new_location
 
